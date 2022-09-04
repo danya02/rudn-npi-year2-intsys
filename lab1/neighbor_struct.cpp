@@ -4,7 +4,7 @@
 namespace lab1 {
     struct GraphNeighbor {
         GraphNode& node;
-        int distance;
+        unsigned int distance;
     };
 }
 #endif // NEIGHBOR_STRUCT

@@ -1,16 +1,29 @@
-#ifndef GRAPH_NODE_H
-#define GRAPH_NODE_H
+#ifndef GRAPH_NODE_SQLITE_H
+#define GRAPH_NODE_SQLITE_H
 #include<ostream>
-namespace lab1 {
-    class GraphNode {
+namespace lab1
+{
+    class GraphNode
+    {
+        private:
+        int id;
+
         public:
-        virtual char type()=0;
-        virtual bool operator==(const GraphNode&) const=0;
-        virtual bool operator!=(const GraphNode&) const=0;
-        virtual ~GraphNode() {}
-        friend std::ostream& operator<<(std::ostream& os, const GraphNode& node);
+        bool operator==(const GraphNode& other) const {
+            return id == other.id;
+        }
+        bool operator!=(const GraphNode& other) const { return !(operator==(other));}
+        ~GraphNode() {}
+
+        friend std::ostream& operator<<(std::ostream& os, const GraphNode& node){
+            os << "GraphNode(" << node.id << ")";
+            return os;
+        }
 
 
+
+        friend class GraphAccessor;
     };
-};
-#endif
+
+} // namespace lab1
+#endif // GRAPH_NODE_SQLITE_H
