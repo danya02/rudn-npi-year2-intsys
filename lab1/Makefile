@@ -1,12 +1,16 @@
 CC = g++
 
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -lsqlite3
 
-all: lab1.o
-	$(CC) $(CFLAGS) lab1.o -o program.out
+all: object
+	$(CC) $(CFLAGS) *.o -o program.out
 
-lab1.o: lab1.cpp
-	$(CC) $(CFLAGS) -c lab1.cpp
+
+object: 
+	$(CC) $(CFLAGS) -c *.cpp
+
+run: all
+	./program.out
 
 clean:
-	rm -f program.out lab1.o
+	rm -f *.out *.o
