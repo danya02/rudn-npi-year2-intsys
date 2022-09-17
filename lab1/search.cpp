@@ -8,7 +8,7 @@
 #include "debug.h"
 
 namespace lab1 {
-    void expand_node(GraphAccessor& g, GraphNode& node){
+    void expand_node(GraphAccessor& g, GraphNode node){
         std::vector<GraphNeighbor> neighbors;
         g.get_neighbors(node, neighbors);
         DEBUG_MSG("Expanding node " << node);
@@ -29,34 +29,54 @@ namespace lab1 {
     }
 
 
-    void run_dijkstra(GraphAccessor& g) {
-        // Run the Dijkstra algorithm on the given graph
+    unsigned long long run_astar_search(GraphAccessor& g) {
+        // Run the Dijkstra/A* algorithm on the given graph
         // The graph accessor must be initialized: the start node must be in the OPEN list,
         // the distances must be unset (except for the start node, to which the distance should be 0), and the previous nodes must be unset.
         
-        GraphNode* next_to_expand = g.get_open_node_with_lowest_value();
-        GraphNode& next_node = *next_to_expand;
-        while(next_to_expand != nullptr){
-            DEBUG_MSG("Expanding node " << next_node);
-            next_node = *next_to_expand;
-            expand_node(g, next_node);
+        unsigned long long expansions = 0;
+
+        GraphNode next_to_expand = g.get_open_node_with_lowest_value();
+        while(g.has_open_nodes()){
+            DEBUG_MSG("Expanding node " << next_to_expand);
+            expand_node(g, next_to_expand);
+            expansions++;
             next_to_expand = g.get_open_node_with_lowest_value();
         }
+        return expansions;
+    }
+
+    unsigned long long run_bfs(GraphAccessor& g) {
+        // Run the BFS algorithm on the given graph
+        // The graph accessor must be initialized: the start node must be in the OPEN list,
+        // the distances must be unset (except for the start node, to which the distance should be 0), and the previous nodes must be unset.
+        //
+        // Is identical to run_astar_search, except for the method used to get the next node to expand.
+        unsigned long long expansions = 0;
+
+        GraphNode next_to_expand = g.get_first_open_node();
+        while(g.has_open_nodes()){
+            DEBUG_MSG("Expanding node " << next_to_expand);
+            expand_node(g, next_to_expand);
+            expansions++;
+            next_to_expand = g.get_open_node_with_lowest_value();
+        }
+        return expansions;
     }
 
 
-    void reconstruct_path(GraphAccessor& g, GraphNode& end_node, std::vector<GraphNode>& save_to){
+    void reconstruct_path(GraphAccessor& g, GraphNode end_node, std::vector<GraphNode>& save_to){
         // Construct a path from the values saved by an invocation of a search algorithm
         // The path will be reversed, with the first element being end_node and the last element being g.get_start_node()
         // The graph accessor must have had a search algorithm run on it, and end_node must be in the CLOSED list.
 
         save_to.clear();
         save_to.push_back(end_node);
-        GraphNode* cur_node = &end_node;
-        const GraphNode& start_node = g.get_start_node();
-        while (*cur_node != start_node){
-            cur_node = g.get_previous_node(*cur_node);
-            save_to.push_back(*cur_node);
+        GraphNode cur_node = end_node;
+        GraphNode start_node = g.get_start_node();
+        while (g.get_previous_node(cur_node)){
+            cur_node = *g.get_previous_node(cur_node);
+            save_to.push_back(cur_node);
         }
     }
 }

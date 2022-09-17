@@ -7,7 +7,8 @@
 
 namespace lab1{
     void expand_node(GraphAccessor& g, GraphNode& node);
-    void run_dijkstra(GraphAccessor& g);
-    void reconstruct_path(GraphAccessor& g, GraphNode& end_node, std::vector<GraphNode>& save_to);
+    unsigned long long run_astar_search(GraphAccessor& g);
+    unsigned long long run_bfs(GraphAccessor& g);
+    void reconstruct_path(GraphAccessor& g, GraphNode end_node, std::vector<GraphNode>& save_to);
 }
 #endif

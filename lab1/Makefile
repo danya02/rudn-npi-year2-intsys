@@ -2,11 +2,11 @@ CC = g++
 
 CFLAGS = -g -Wall -lsqlite3
 
-all: dijkstra.o graph_accessor.o neighbor_struct.o lab1.o debug.h
+all: search.o graph_accessor.o neighbor_struct.o lab1.o debug.h
 	$(CC) $(CFLAGS) *.o -o program.out
 
-dijkstra.o: dijkstra.cpp dijkstra.h
-	$(CC) $(CFLAGS) -c dijkstra.cpp
+search.o: search.cpp search.h
+	$(CC) $(CFLAGS) -c search.cpp
 
 graph_accessor.o: graph_accessor.cpp graph_accessor.h 
 	$(CC) $(CFLAGS) -c graph_accessor.cpp

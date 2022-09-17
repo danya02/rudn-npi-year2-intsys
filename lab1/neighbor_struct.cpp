@@ -3,7 +3,7 @@
 #include "graph_node.h"
 namespace lab1 {
     struct GraphNeighbor {
-        GraphNode& node;
+        GraphNode node;
         double distance;
     };
 }

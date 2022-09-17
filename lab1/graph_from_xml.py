@@ -1,12 +1,13 @@
 import bs4
 import sqlite3
-db = sqlite3.connect(input('Database file: '))
+import sys
+db = sqlite3.connect(sys.argv[2])
 db.execute('CREATE TABLE IF NOT EXISTS meta(key, value)')
 db.execute('DELETE FROM meta')
 db.execute('CREATE TABLE IF NOT EXISTS obstacles(node_i, node_j, PRIMARY KEY(node_i, node_j))')
 db.execute('DELETE FROM obstacles')
 db.commit()
-with open(input('XML file: ')) as f:
+with open(sys.argv[1]) as f:
     soup = bs4.BeautifulSoup(f, 'xml')
     root = soup.find('root')
     start = root.find('start')

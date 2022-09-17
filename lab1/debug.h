@@ -1,5 +1,4 @@
 #include<ostream>
-#define DEBUG
 #ifdef DEBUG
 #define DEBUG_MSG(str) do { std::cout << str << std::endl; } while( false )
 #else
