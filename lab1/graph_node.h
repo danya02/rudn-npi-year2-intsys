@@ -6,17 +6,18 @@ namespace lab1
     class GraphNode
     {
         private:
-        int id;
+        int i;
+        int j;
 
         public:
         bool operator==(const GraphNode& other) const {
-            return id == other.id;
+            return i == other.i && j == other.j;
         }
         bool operator!=(const GraphNode& other) const { return !(operator==(other));}
         ~GraphNode() {}
 
         friend std::ostream& operator<<(std::ostream& os, const GraphNode& node){
-            os << "GraphNode(" << node.id << ")";
+            os << "GraphNode(" << node.i << ',' << node.j << ")";
             return os;
         }
 

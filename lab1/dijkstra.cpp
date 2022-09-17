@@ -34,13 +34,13 @@ namespace lab1 {
         // The graph accessor must be initialized: the start node must be in the OPEN list,
         // the distances must be unset (except for the start node, to which the distance should be 0), and the previous nodes must be unset.
         
-        GraphNode* next_to_expand = g.get_least_dist_open_node();
+        GraphNode* next_to_expand = g.get_open_node_with_lowest_value();
         GraphNode& next_node = *next_to_expand;
         while(next_to_expand != nullptr){
             DEBUG_MSG("Expanding node " << next_node);
             next_node = *next_to_expand;
             expand_node(g, next_node);
-            next_to_expand = g.get_least_dist_open_node();
+            next_to_expand = g.get_open_node_with_lowest_value();
         }
     }
 
