@@ -15,7 +15,7 @@ namespace lab1 {
         for(auto neighbor: neighbors){
             DEBUG_MSG("Neighbor: " << neighbor.node);
         }
-        unsigned int dist_to_here = g.get_distance_to(node);
+        double dist_to_here = g.get_distance_to(node);
         for(auto p = neighbors.begin(); p!=neighbors.end(); p++){
             DEBUG_MSG("Distance to neighbor " << p->node << " without going through " << node << ": " << g.get_distance_to(p->node));
             DEBUG_MSG("Distance to neighbor " << p->node << " going through " << node << ": " << dist_to_here + p->distance);
@@ -59,7 +59,7 @@ namespace lab1 {
             DEBUG_MSG("Expanding node " << next_to_expand);
             expand_node(g, next_to_expand);
             expansions++;
-            next_to_expand = g.get_open_node_with_lowest_value();
+            next_to_expand = g.get_first_open_node();
         }
         return expansions;
     }
@@ -74,8 +74,12 @@ namespace lab1 {
         save_to.push_back(end_node);
         GraphNode cur_node = end_node;
         GraphNode start_node = g.get_start_node();
+        DEBUG_MSG("Reconstructing path from " << cur_node);
+        DEBUG_MSG("Its previous: " << g.get_previous_node(cur_node));
         while (g.get_previous_node(cur_node)){
             cur_node = *g.get_previous_node(cur_node);
+            DEBUG_MSG("Next: " << cur_node);
+            DEBUG_MSG("Its previous: " << g.get_previous_node(cur_node));
             save_to.push_back(cur_node);
         }
     }

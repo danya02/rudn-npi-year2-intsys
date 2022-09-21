@@ -14,18 +14,20 @@ namespace lab1 {
         private:
         int connections;
         int metrictype; //0=euclidean, 1=manhattan, 2=octile
-        double hweight;
-        std::set<GraphNode> open_nodes;
-        std::set<GraphNode> closed_nodes;
-        std::set<std::pair<int, int>> walls;
-        std::map<GraphNode, GraphNode> came_from;
-        std::map<GraphNode, double> g_score;
         public:
         GraphNode start_node;
         GraphNode end_node;
         unsigned long long nodes_constructed = 0;
         int width;
         int height;
+        int algorithm; // 0=A*, 1=Dijkstra, 2=BFS
+        double hweight;
+        std::set<GraphNode> open_nodes;
+        std::set<GraphNode> closed_nodes;
+        std::set<std::pair<int, int>> walls;
+        std::map<GraphNode, GraphNode> came_from;
+        std::map<GraphNode, double> g_score;
+
 
 
 
@@ -50,9 +52,9 @@ namespace lab1 {
         void get_neighbors_8(const GraphNode& node, std::vector<GraphNeighbor>& neighbors);
 
         public:
-        unsigned int get_distance_to(const GraphNode& node) const ;
+        double get_distance_to(const GraphNode& node) const ;
 
-        void set_distance_to(const GraphNode& node, unsigned int dist);
+        void set_distance_to(const GraphNode& node, double dist);
 
         GraphNode* get_previous_node(const GraphNode& node);
 

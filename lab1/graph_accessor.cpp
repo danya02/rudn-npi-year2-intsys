@@ -21,8 +21,9 @@ namespace lab1
         }
         f >> width >> height;
         f >> connections;
-        f >> metrictype;
         f >> hweight;
+        f >> metrictype;
+        f >> algorithm;
         f >> start_node.i >> start_node.j;
         f >> end_node.i >> end_node.j;
         int num_walls;
@@ -88,8 +89,13 @@ namespace lab1
                 if(i != 0 && j != 0){
                     continue;
                 }
+
                 int ni = node.i + i;
                 int nj = node.j + j;
+                if(get_node_by_id(ni, nj) == get_end_node()){
+                    neighbors.push_back(GraphNeighbor{.node=get_node_by_id(ni, nj), .distance=1.0});
+                    continue;
+                }
                 if(ni < 0 || nj < 0 || ni >= height || nj >= width){
                     continue;
                 }
@@ -126,6 +132,10 @@ namespace lab1
                 }
                 int ni = node.i + i;
                 int nj = node.j + j;
+                if(get_node_by_id(ni, nj) == get_end_node()){
+                    neighbors.push_back(GraphNeighbor{.node=get_node_by_id(ni, nj), .distance=1.0});
+                    continue;
+                }
                 if(ni < 0 || nj < 0 || ni >= height || nj >= width){
                     continue;
                 }
@@ -138,21 +148,21 @@ namespace lab1
                 if(is_wall(node.i, node.j + j)){
                     continue;
                 }
-                neighbors.push_back(GraphNeighbor{ .node=get_node_by_id(ni, nj), .distance=sqrt(2)});
+                neighbors.push_back(GraphNeighbor{ .node=get_node_by_id(ni, nj), .distance=1.41421356237f});
             }
         }
 
     }
 
 
-    unsigned int GraphAccessor::get_distance_to(const GraphNode& node) const {
+    double GraphAccessor::get_distance_to(const GraphNode& node) const {
         if(g_score.find(node) == g_score.end()){
-            return -1;
+            return __DBL_MAX__;
         }
         return g_score.at(node);
     }
 
-    void GraphAccessor::set_distance_to(const GraphNode& node, unsigned int dist){
+    void GraphAccessor::set_distance_to(const GraphNode& node, double dist){
         g_score[node] = dist;
     }
 
@@ -195,6 +205,7 @@ namespace lab1
                 answer = 0; 
                 break;
         }
+        DEBUG_MSG("Heuristic for " << ai << ", " << aj << " and " << bi << ", " << bj << " is " << answer);
         return answer;
     }
 

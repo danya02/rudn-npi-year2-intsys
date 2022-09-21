@@ -27,6 +27,7 @@
         "streambuf": "cpp",
         "string": "cpp",
         "string_view": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "fstream": "cpp"
     }
 }

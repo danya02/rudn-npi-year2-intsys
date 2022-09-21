@@ -1,5 +1,12 @@
 import sqlite3
 import sys
+output = sys.stdout
+if len(sys.argv) > 2:
+    output = open(sys.argv[2], "w")
+
+realPrint = print
+print = lambda *args, **kwargs: realPrint(*args, file=output, **kwargs)
+
 conn = sqlite3.connect(sys.argv[1])
 c = conn.cursor()
 def print_meta(key, **kwargs):
@@ -20,6 +27,17 @@ elif metric_type == "octile":
     print("2")
 else:
     print('9')
+
+c.execute("SELECT value FROM meta WHERE key = 'algorithm'")
+algorithm = c.fetchone()[0].lower()
+if algorithm == "astar":
+    print("0")
+elif algorithm == "dijkstra":
+    print("1")
+elif algorithm == "bfs":
+    print("2")
+else:
+    print("9")
 
 print_meta('start_node_i', end=" ")
 print_meta('start_node_j')
