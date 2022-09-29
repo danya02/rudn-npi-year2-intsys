@@ -27,6 +27,8 @@ namespace lab1 {
         std::set<std::pair<int, int>> walls;
         std::map<GraphNode, GraphNode> came_from;
         std::map<GraphNode, double> g_score;
+        std::map<GraphNode, double> h_score;
+        
 
 
 

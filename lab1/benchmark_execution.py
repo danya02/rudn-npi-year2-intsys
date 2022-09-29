@@ -86,6 +86,19 @@ def benchmark_all():
                                 for metric in metrics:
                                     print(str(metric).replace(',', '\t'))
                                     f.write(str(metric) + '\n')
+
+def benchmark_some():
+    map = 'maps/instance4.xml'
+    algorithm = 'astar'
+    metrictype = 'euclidean'
+    hweight = 1
+    connections = 4
+    metrics = run_search(map, algorithm, metrictype, hweight, connections, iterations=30)
+    with open('results_new.csv', 'a') as f:
+        for metric in metrics:
+            print(str(metric).replace(',', '\t'))
+            f.write(str(metric) + '\n')
+
 if __name__ == '__main__':
     print("Running benchmarks...")
-    benchmark_all()
+    benchmark_some()

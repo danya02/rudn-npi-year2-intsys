@@ -37,7 +37,7 @@ namespace lab1 {
         unsigned long long expansions = 0;
 
         GraphNode next_to_expand = g.get_open_node_with_lowest_value();
-        while(g.has_open_nodes()){
+        while(g.has_open_nodes() && next_to_expand != g.get_end_node()){
             DEBUG_MSG("Expanding node " << next_to_expand);
             expand_node(g, next_to_expand);
             expansions++;
@@ -55,7 +55,7 @@ namespace lab1 {
         unsigned long long expansions = 0;
 
         GraphNode next_to_expand = g.get_first_open_node();
-        while(g.has_open_nodes()){
+        while(g.has_open_nodes() && next_to_expand != g.get_end_node()){
             DEBUG_MSG("Expanding node " << next_to_expand);
             expand_node(g, next_to_expand);
             expansions++;

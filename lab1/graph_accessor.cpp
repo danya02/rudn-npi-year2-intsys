@@ -221,7 +221,13 @@ namespace lab1
         GraphNode lowest_node = *open_nodes.begin();
         double lowest_value = __DBL_MAX__;
         for(auto& node : open_nodes){
-            double value = get_distance_to(node) + heuristic_function(metrictype, node.i, node.j, end_node.i, end_node.j)*hweight;
+            double value ; // = get_distance_to(node) + heuristic_function(metrictype, node.i, node.j, end_node.i, end_node.j)*hweight;
+            if(h_score.find(node) == h_score.end()){
+                value = heuristic_function(metrictype, node.i, node.j, end_node.i, end_node.j)*hweight;
+                h_score[node] = value + get_distance_to(node);
+            } else {
+                value = h_score.at(node) + get_distance_to(node);
+            }
             if(value < lowest_value){
                 lowest_value = value;
                 lowest_node = node;

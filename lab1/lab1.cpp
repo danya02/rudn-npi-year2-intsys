@@ -47,7 +47,7 @@ int main(int argc, char** argv){
 
 
     DEBUG_MSG("Opening database...");
-    std::string file = argv[1];
+    std::string file = "maps/instance4.txt";
     GraphAccessor g(file);
     DEBUG_MSG("Initializing database...");
     g.set_distance_to(g.get_start_node(), 0);
@@ -102,6 +102,8 @@ int main(int argc, char** argv){
                 std::cout << "E";
             } else if(g.is_wall(i,j)){
                 std::cout << "X";
+            } else if(g.closed_nodes.find(GraphNode(i,j)) != g.closed_nodes.end()){
+                std::cout << ".";
 
             } else {
                 bool found = false;
