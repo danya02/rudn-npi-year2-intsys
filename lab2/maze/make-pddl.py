@@ -1,21 +1,20 @@
 import sys
 import json
 template = open(sys.argv[1]).read()
+data = json.load(open(sys.argv[2]))
 
 TELEPORT_GROUPS = set()
 def emit_template(template):
     for line in template.splitlines():
 
         if '<!--MAPLIST-->' in line:
-            map_file = line.split(';')[-1].strip()
-            maps = json.load(open(map_file))
+            maps = data
             chart = maps['chart']
             for h in range(len(chart)):
                 for w in range(len(chart[h])):
                     print(f'  t{w}_{h} - tile')
         elif '<!--MAPRULES-->' in line:
-            map_file = line.split(';')[-1].strip()
-            maps = json.load(open(map_file))
+            maps = data
             chart = maps['chart']
             tiles = maps['tile_types']
 
@@ -38,23 +37,46 @@ def emit_template(template):
                     for tag in cur_tile:
                         if tag.startswith('teleport-group-'):
                             group = tag.replace('teleport-group-','')
-                            print(f'  (teleporter_at t{w}_{h} group_{group})')
+                            print(f'  (teleporter_at t{w}_{h} tgroup_{group})')
+                            print(f'  (item_at t{w}_{h})')
+                        if tag.startswith('block-'):
+                            group = tag.replace('block-','')
+                            print(f'  (block_at t{w}_{h} bgroup_{group})')
+                            print(f'  (item_at t{w}_{h})')
 
         elif '<!--TELEPORTGROUPS-->' in line:
-            map_file = line.split(';')[-1].strip()
-            maps = json.load(open(map_file))
+            maps = data
             chart = maps['chart']
             tiles = maps['tile_types']
+            groups = set()
             for tile in tiles:
                 conf = tiles[tile]
                 for item in conf:
                     if item.startswith('teleport-group-'):
                         group = item.replace('teleport-group-','')
-                        print(f' group_{group} - teleport_group')
+                        groups.add(group)
+            for group in groups:
+                print(f' tgroup_{group} - teleport_group')
+        elif '<!--BLOCKGROUPS-->' in line:
+            maps = data
+            chart = maps['chart']
+            tiles = maps['tile_types']
+            groups = set()
+            for tile in tiles:
+                conf = tiles[tile]
+                for item in conf:
+                    if item.startswith('block-'):
+                        group = item.replace('block-','')
+                        groups.add(group)
+                    elif item.startswith("blocktarget-"):
+                        group = item.replace('blocktarget-','')
+                        groups.add(group)
+            
+            for group in groups:
+                print(f' bgroup_{group} - block_group')
 
         elif '<!--MAPGOALS-->' in line:
-            map_file = line.split(';')[-1].strip()
-            maps = json.load(open(map_file))
+            maps = data
             chart = maps['chart']
             tiles = maps['tile_types']
 
@@ -64,6 +86,10 @@ def emit_template(template):
                     cur_tile = tiles[cur_tile]
                     if 'end' in cur_tile:
                         print(f'  (at t{w}_{h})  ;; This is the tile that the agent should end on')
+                    for tag in cur_tile:
+                        if tag.startswith('blocktarget-'):
+                            group = tag.replace('blocktarget-','')
+                            print(f'  (block_at t{w}_{h} bgroup_{group})')
 
         elif '<!--include-->' in line:
             file_to_include = line.split(';')[-1]

@@ -1,0 +1,20 @@
+{
+    "chart":[
+        "a..a..T....a",
+        "xxxxxxxxxxxx",
+        "Tx...x...x.A",
+        ".x.x.x.x.x.A",
+        ".x.x.x.x.x.A",
+        ".x.x.x.x.x..",
+        "...x...x...S"
+    ],
+    "tile_types": {
+        ".": ["walk"],
+        "S": ["start", "walk", "end"],
+        "A": ["walk", "block-A"],
+        "a": ["walk", "blocktarget-A"],
+        "T": ["walk", "teleport-group-1"],
+        "x": ["wall"]
+    },
+    "fps": 5
+}

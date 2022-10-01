@@ -1,18 +1,22 @@
 {
     "chart":[
-        "....T..E",
-        "........",
-        "........",
-        "........",
-        "........",
-        "........",
-        "........",
-        "S...T..."
+        "TxAxF..E",
+        ".x.xxxxx",
+        ".x.x....",
+        ".x.x.xx.",
+        ".x.x..x.",
+        ".x.x.Fx.",
+        ".x.xxxx.",
+        "SxTxA..."
     ],
     "tile_types": {
         ".": ["walk"],
         "S": ["start", "walk"],
         "E": ["end", "walk"],
-        "T": ["teleport-group-A", "walk"]
-    }
+        "T": ["teleport-group-T", "walk"],
+        "A": ["teleport-group-A", "walk"],
+        "F": ["teleport-group-F", "walk"],
+        "x": ["wall"]
+    },
+    "fps": 5
 }

@@ -1,10 +1,33 @@
-all: domain.pddl simple-maze.pddl
+all: domain.pddl portal-move-test
 
 domain.pddl: domain-template.pddl make-pddl.py
-	python make-pddl.py domain-template.pddl > domain.pddl
+	python make-pddl.py domain-template.pddl simple_maze.json > domain.pddl
 
-simple-maze.pddl: simple-maze-template.pddl make-pddl.py
-	python make-pddl.py simple-maze-template.pddl > simple-maze.pddl
+simple-maze: maze-template.pddl make-pddl.py simple_maze.json
+	python make-pddl.py maze-template.pddl simple_maze.json > current-map.pddl
+	cp simple_maze.json current_map.json
+
+simple-move: maze-template.pddl make-pddl.py simple_move.json
+	python make-pddl.py maze-template.pddl simple_move.json > current-map.pddl
+	cp simple_move.json current_map.json
+
+portal-move-test: maze-template.pddl make-pddl.py portal_move_test.json
+	python make-pddl.py maze-template.pddl portal_move_test.json > current-map.pddl
+	cp portal_move_test.json current_map.json
+
+
+clean:
+	rm -f domain.pddl simple-maze.pddl simple-move.pddl current_map.json
+	rm -f output/*
+
+plan-convert:
+	python ff_plan_converter.py
+
+vis: all plan-convert
+	python visualizer.py
+
+gif: all
+	convert -delay 15 output/*.png output/animation.gif
 
 env:
 	echo "Run 'planutils activate' now:"
