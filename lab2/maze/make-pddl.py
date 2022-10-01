@@ -43,6 +43,10 @@ def emit_template(template):
                             group = tag.replace('block-','')
                             print(f'  (block_at t{w}_{h} bgroup_{group})')
                             print(f'  (item_at t{w}_{h})')
+                    
+                    if 'color-remover-machine' in cur_tile:
+                        print(f'  (color_remover_machine_at t{w}_{h})')
+                        print(f'  (item_at t{w}_{h}) ;; cannot place blocks on machines')
 
         elif '<!--TELEPORTGROUPS-->' in line:
             maps = data

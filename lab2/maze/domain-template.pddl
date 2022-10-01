@@ -6,6 +6,10 @@
     teleport_group - object
     block_group - object
 )
+(:constants
+    bgroup_colorless - block_group
+    tgroupunused - teleport_group
+)
 
 
 (:predicates
@@ -19,9 +23,11 @@
     (block_at ?x - tile ?group - block_group) ;; there is a block on tile x belonging to group
     (block_target_at ?x - tile ?group - block_group) ;; there is a block target on tile x belonging to group
     (holding_block ?group - block_group) ;; the agent is holding a block belonging to group
-    (item_at ?x - tile) ;; there is an item on tile x
+    (item_at ?x - tile) ;; there is an item on tile x (i.e. you cannot place an item on this tile)
 
     (holding_tp ?group - teleport_group) ;; the agent is holding a teleporter belonging to group
+
+    (color_remover_machine_at ?x - tile) ;; there is a color remover machine on tile x
 )
 
 
@@ -139,6 +145,25 @@
         (item_at ?x)
         (not (holding_item))
         (not (holding_tp ?group))
+    )
+)
+
+(:action use_color_remover_machine
+    ;; The agent is standing at a tile that is a color remover machine,
+    ;; and removes the color of the block they are holding
+    :parameters (
+        ?x - tile
+        ?block - block_group
+    )
+    :precondition (and
+        (at ?x)
+        (holding_block ?block)
+        (holding_item)
+        (color_remover_machine_at ?x)
+    )
+    :effect (and
+        (not (holding_block ?block))
+        (holding_block bgroup_colorless)
     )
 )
 )

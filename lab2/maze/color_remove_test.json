@@ -1,0 +1,29 @@
+{
+    "chart":[
+        ".x....M...x.",
+        ".x........x.",
+        "............",
+        "............",
+        "..A.B..C.D..",
+        "............",
+        "S..........."
+    ],
+    "tile_types": {
+        ".": ["walk"],
+        "S": ["start", "walk", "end"],
+        "A": ["walk", "block-a"],
+        "B": ["walk", "block-b"],
+        "C": ["walk", "block-c"],
+        "D": ["walk", "block-d"],
+        "x": ["walk", "blocktarget-colorless"],
+        "M": ["walk", "color-remover-machine"]
+    },
+    "fps": 5,
+    "colors":
+    {
+        "block-a": [255, 0, 0],
+        "block-b": [255, 255, 0],
+        "block-c": [0, 255, 0],
+        "block-d": [0, 0, 255]
+    }
+}

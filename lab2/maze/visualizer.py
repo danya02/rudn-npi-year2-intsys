@@ -4,6 +4,8 @@ import colorsys
 import hashlib
 import re
 
+from utils import get_item_color
+
 class Presenter:
     def present_frame(self, frame):
         raise NotImplementedError
@@ -49,11 +51,6 @@ class FilePresenter(Presenter):
     def present_end(self):
         pass
 
-def get_item_color(type: str, item: str) -> pygame.Color:
-    it_hash = int(hashlib.md5((type + '-' + item).encode('utf-8')).hexdigest(), 16)
-    it_color = colorsys.hsv_to_rgb(it_hash % 1000 / 1000, 1, 1)
-    color = pygame.Color(*[int(c * 255) for c in it_color])
-    return color
 
 class Renderer:
     TILE_SIZE = 64
@@ -65,11 +62,14 @@ class Renderer:
         self.initialize_map()
         self.initialize_state()
         self.initialize_my_surface()
-        # Image from the Google Noto Color Emoji font, licensed under the SIL Open Font License
+        # Images from the Google Noto Color Emoji font, licensed under the SIL Open Font License
         self.robot_graphic = pygame.image.load('robot_1f916.png')
         self.robot_graphic = pygame.transform.scale(self.robot_graphic, (self.TILE_SIZE, self.TILE_SIZE))
         self.robot_outline = pygame.image.load('robot_outline.png')
         self.robot_outline = pygame.transform.scale(self.robot_outline, (self.TILE_SIZE, self.TILE_SIZE))
+
+        self.color_remover_machine_graphic = pygame.image.load('gear_2699-fe0f.png')
+        self.color_remover_machine_graphic = pygame.transform.scale(self.color_remover_machine_graphic, (self.TILE_SIZE, self.TILE_SIZE))
 
     def initialize_map(self):
         self.chart = []
@@ -94,6 +94,7 @@ class Renderer:
     def initialize_state(self):
         self.carrying_item = None
         self.teleporting = None
+        self.painting_block = None
 
     def initialize_my_surface(self):
         self.surface = pygame.Surface((self.width * self.TILE_SIZE, self.height * self.TILE_SIZE))
@@ -135,7 +136,7 @@ class Renderer:
                 for tag in self.chart[h][w]:
                     if tag.startswith('teleport-group-'):
                         teleport_group = tag.replace('teleport-group-', '')
-                        color = get_item_color('teleport', teleport_group)
+                        color = get_item_color('teleport', teleport_group, self.map_data)
                         # Draw an 2:1 ellipse in the middle of the tile
                         ellipse_rect = pygame.Rect(w * self.TILE_SIZE, h * self.TILE_SIZE,
                             self.TILE_SIZE, self.TILE_SIZE)
@@ -148,19 +149,21 @@ class Renderer:
                 for tag in self.chart[h][w]:
                     if tag.startswith('block-'):
                         block = tag.replace('block-', '')
-                        color = get_item_color('block', block)
+                        color = get_item_color('block', block, self.map_data)
                         rect = pygame.Rect(w * self.TILE_SIZE, h * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE)
                         rect.inflate_ip(-self.TILE_SIZE // 4, -self.TILE_SIZE // 4)
                         pygame.draw.rect(self.surface, color, rect)
                     if tag.startswith('blocktarget-'):
                         block = tag.replace('blocktarget-', '')
-                        color = get_item_color('block', block)
+                        color = get_item_color('block', block, self.map_data)
                         rect = pygame.Rect(w * self.TILE_SIZE, h * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE)
                         rect.inflate_ip(-self.TILE_SIZE // 4, -self.TILE_SIZE // 4)
                         rect.inflate_ip(+self.TILE_SIZE // 8, +self.TILE_SIZE // 8)
                         pygame.draw.rect(self.surface, color, rect, 2)
                     if tag == 'end':
                         self.surface.blit(self.robot_outline, (w * self.TILE_SIZE, h * self.TILE_SIZE))
+                    if tag == 'color-remover-machine':
+                        self.surface.blit(self.color_remover_machine_graphic, (w * self.TILE_SIZE, h * self.TILE_SIZE))
 
 
     def draw_robot(self):
@@ -180,7 +183,7 @@ class Renderer:
                 if tag.startswith('teleport-group-'):
                     teleport_group = tag.replace('teleport-group-', '')
                     break
-            color = get_item_color('teleport', teleport_group)
+            color = get_item_color('teleport', teleport_group, self.map_data)
 
             # Also draw a line between the two locations
             pygame.draw.line(self.surface, color,
@@ -196,22 +199,44 @@ class Renderer:
             type, item = self.carrying_item
             if type == 'teleporter':
                 # If the robot is holding a teleporter, draw a small version of it on top of the robot
-                color = get_item_color('teleport', item)
+                color = get_item_color('teleport', item, self.map_data)
                 ellipse_rect = pygame.Rect(w * self.TILE_SIZE, h * self.TILE_SIZE,
                     self.TILE_SIZE, self.TILE_SIZE)
                 ellipse_rect.inflate_ip(-self.TILE_SIZE // 2, -self.TILE_SIZE // 4)
                 ellipse_rect.inflate_ip(-self.TILE_SIZE // 4, -self.TILE_SIZE // 8)
                 pygame.draw.ellipse(self.surface, color, ellipse_rect)
 
-            elif type == 'block':
+            elif type == 'block' and not self.painting_block:
                 # If the robot is holding a block, draw a diamond on top of the robot
-                color = get_item_color('block', item)
+                color = get_item_color('block', item, self.map_data)
                 pygame.draw.polygon(self.surface, color, [
                     (w * self.TILE_SIZE + self.TILE_SIZE // 2, h * self.TILE_SIZE + self.TILE_SIZE // 4),
                     (w * self.TILE_SIZE + self.TILE_SIZE // 4, h * self.TILE_SIZE + self.TILE_SIZE // 2),
                     (w * self.TILE_SIZE + self.TILE_SIZE // 2, h * self.TILE_SIZE + self.TILE_SIZE // 4 * 3),
                     (w * self.TILE_SIZE + self.TILE_SIZE // 4 * 3, h * self.TILE_SIZE + self.TILE_SIZE // 2),
                 ])
+            elif type == 'block' and self.painting_block:
+                # If the robot is holding a block and currently painting a block,
+                # draw the diamond as two triangles next to each other:
+                # the left shows the old color, the right shows the new color
+                color = get_item_color('block', item, self.map_data)
+                new_color = get_item_color('block', self.painting_block, self.map_data)
+                pygame.draw.polygon(self.surface, color, [
+                    (w * self.TILE_SIZE + self.TILE_SIZE // 2, h * self.TILE_SIZE + self.TILE_SIZE // 4),
+                    (w * self.TILE_SIZE + self.TILE_SIZE // 4, h * self.TILE_SIZE + self.TILE_SIZE // 2),
+                    (w * self.TILE_SIZE + self.TILE_SIZE // 2, h * self.TILE_SIZE + self.TILE_SIZE // 4 * 3),
+                ])
+                pygame.draw.polygon(self.surface, new_color, [
+                    (w * self.TILE_SIZE + self.TILE_SIZE // 2, h * self.TILE_SIZE + self.TILE_SIZE // 4),
+                    (w * self.TILE_SIZE + self.TILE_SIZE // 4 * 3, h * self.TILE_SIZE + self.TILE_SIZE // 2),
+                    (w * self.TILE_SIZE + self.TILE_SIZE // 2, h * self.TILE_SIZE + self.TILE_SIZE // 4 * 3),
+                ])
+
+                # After painting, the block being held becomes the new color
+                self.carrying_item = ('block', self.painting_block)
+                self.painting_block = None
+
+
 
     def execute_line(self, line):
         print(line)
@@ -233,6 +258,9 @@ class Renderer:
         # (drop_tp t6_0 tgroup_1) -- Drop teleporter in tile 6,0 in group tgroup_1
         elif match := re.match(r'\(drop_tp t(\d+)_(\d+) tgroup_(.+)\)', line):
             self.drop_teleporter(int(match.group(1)), int(match.group(2)), match.group(3))
+        # (use_color_remover_machine t0_0 bgroup_a) -- Use color remover machine in tile 0,0 to remove color from block in group bgroup_a
+        elif match := re.match(r'\(use_color_remover_machine t(\d+)_(\d+) bgroup_(.+)\)', line):
+            self.use_color_remover_machine(int(match.group(1)), int(match.group(2)), match.group(3))
         else:
             print('Unknown line:', line)
 
@@ -267,11 +295,15 @@ class Renderer:
         if self.robot_location == (x, y):
             self.carrying_item = None
             self.chart[y][x].append(f'teleport-group-{group}')
+    
+    def use_color_remover_machine(self, x, y, group):
+        if self.robot_location == (x, y):
+            self.painting_block = 'colorless'
 
 if __name__ == '__main__':
     map = json.load(open('current_map.json'))
     plan = open('sas_plan').read()
-    #presenter = FilePresenter('output')
-    presenter = ScreenPresenter()
+    presenter = FilePresenter('output')
+    #presenter = ScreenPresenter()
     renderer = Renderer(map, plan, presenter)
     renderer.run()

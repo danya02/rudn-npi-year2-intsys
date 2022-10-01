@@ -1,4 +1,4 @@
-all: domain.pddl portal-move-test
+all: domain.pddl color-remove-test
 
 domain.pddl: domain-template.pddl make-pddl.py
 	python make-pddl.py domain-template.pddl simple_maze.json > domain.pddl
@@ -16,8 +16,13 @@ portal-move-test: maze-template.pddl make-pddl.py portal_move_test.json
 	cp portal_move_test.json current_map.json
 
 
+color-remove-test: maze-template.pddl make-pddl.py color_remove_test.json
+	python make-pddl.py maze-template.pddl color_remove_test.json > current-map.pddl
+	cp color_remove_test.json current_map.json
+
+
 clean:
-	rm -f domain.pddl simple-maze.pddl simple-move.pddl current_map.json
+	rm -f domain.pddl simple-maze.pddl simple-move.pddl current_map.json current-map.pddl current-map.pddl.plan ff_plan sas_plan
 	rm -f output/*
 
 plan-convert:

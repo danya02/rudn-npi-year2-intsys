@@ -11,10 +11,15 @@
     "tile_types": {
         ".": ["walk"],
         "S": ["start", "walk", "end"],
-        "A": ["walk", "block-A"],
-        "a": ["walk", "blocktarget-A"],
+        "A": ["walk", "block-a"],
+        "a": ["walk", "blocktarget-a"],
         "T": ["walk", "teleport-group-1"],
         "x": ["wall"]
     },
-    "fps": 5
+    "fps": 5,
+    "colors":
+    {
+        "block-a": [255, 0, 0],
+        "teleport-1": [0, 0, 255]
+    }
 }

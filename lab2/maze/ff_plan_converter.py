@@ -3,6 +3,9 @@ ff_output = open('ff_plan', 'r')
 ff_plan = []
 inside_plan_section = 0
 for line in ff_output:
+    if 'ff: goal can be simplified to FALSE. No plan will solve it' in line:
+        print(line)
+        sys.exit(1)
     if 'ff: found legal plan as follows' in line:
         inside_plan_section = 2
     elif inside_plan_section:
