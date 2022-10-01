@@ -8,7 +8,7 @@
 )
 (:constants
     bgroup_colorless - block_group
-    tgroupunused - teleport_group
+    tgroup_unpaired - teleport_group
 )
 
 
@@ -29,6 +29,9 @@
 
     (color_remover_machine_at ?x - tile) ;; there is a color remover machine on tile x
     (color_assigner_machine_at ?x - tile ?group - block_group) ;; there is a color assigner machine on tile x belonging to group
+
+    (teleport_unpairer_at ?x - tile) ;; there is a teleporter unpairer on tile x
+    (teleport_pairer_at ?x - tile ?group - teleport_group) ;; there is a teleporter pairer on tile x belonging to group
 )
 
 
@@ -61,6 +64,8 @@
         (walkable ?target)
         (not (at ?target)) ;; This is so that the agent does not teleport to the tile they are in --
         ;; if this is not here, the agent may waste time trying to teleport to the same tile
+
+        (not (teleporter_at ?current tgroup_unpaired)) ;; This is so that unpaired teleporters don't work.
     )
     :effect (and
         (not (at ?current))
@@ -186,4 +191,43 @@
         (holding_block ?block)
     )
 )
+
+(:action unpair_tp
+    ;; The agent is standing at a tile that is a teleporter unpairer,
+    ;; and unpairs the teleporter they are holding
+    :parameters (
+        ?x - tile
+        ?group - teleport_group
+    )
+    :precondition (and
+        (at ?x)
+        (holding_tp ?group)
+        (holding_item)
+        (teleport_unpairer_at ?x)
+    )
+    :effect (and
+        (not (holding_tp ?group))
+        (holding_tp tgroup_unpaired)
+    )
+)
+
+(:action pair_tp
+    ;; The agent is standing at a tile that is a teleporter pairer,
+    ;; and pairs the teleporter they are holding to the pairer's teleporter group
+    :parameters (
+        ?x - tile
+        ?group - teleport_group
+    )
+    :precondition (and
+        (at ?x)
+        (holding_tp tgroup_unpaired)
+        (holding_item)
+        (teleport_pairer_at ?x ?group)
+    )
+    :effect (and
+        (not (holding_tp tgroup_unpaired))
+        (holding_tp ?group)
+    )
+)
+
 )

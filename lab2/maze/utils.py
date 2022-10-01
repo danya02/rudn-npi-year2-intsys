@@ -11,7 +11,7 @@ def get_item_color(type: str, item: str, context: dict=None) -> pygame.Color:
     if f'{type}-{item}'.lower() in context.get('colors', {}):
         return pygame.Color(context['colors'][f'{type}-{item}'.lower()])
 
-    if item == 'colorless':
+    if (type, item) in [('block', 'colorless'), ('teleport', 'unpaired')]:
         return pygame.Color(255, 255, 255)
 
     it_hue = get_item_hue(type, item)

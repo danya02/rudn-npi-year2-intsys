@@ -1,4 +1,4 @@
-all: domain.pddl color-trans-test
+all: domain.pddl portal-trans-test
 
 domain.pddl: domain-template.pddl make-pddl.py
 	python make-pddl.py domain-template.pddl simple_maze.json > domain.pddl
@@ -23,6 +23,10 @@ color-remove-test: maze-template.pddl make-pddl.py color_remove_test.json
 color-trans-test: maze-template.pddl make-pddl.py color_trans_test.json
 	python make-pddl.py maze-template.pddl color_trans_test.json > current-map.pddl
 	cp color_trans_test.json current_map.json
+
+portal-trans-test: maze-template.pddl make-pddl.py portal_trans_test.json
+	python make-pddl.py maze-template.pddl portal_trans_test.json > current-map.pddl
+	cp portal_trans_test.json current_map.json
 
 
 clean:

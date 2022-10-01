@@ -77,6 +77,16 @@ class Renderer:
         self.color_assigner_machine_graphic = pygame.transform.scale(self.color_assigner_machine_graphic, (self.TILE_SIZE, self.TILE_SIZE))
         self.color_assigner_machine_cache = dict()
 
+        self.teleporter_unpairer_graphic = pygame.image.load('hammer-and-pick_2692-fe0f.png')
+        self.teleporter_unpairer_graphic = pygame.transform.scale(self.teleporter_unpairer_graphic, (self.TILE_SIZE, self.TILE_SIZE))
+
+        self.teleporter_pairer_graphic = pygame.image.load('link_1f517.png')
+        # make the image white
+        self.teleporter_pairer_graphic.fill((255,255,255,0), special_flags=pygame.BLEND_RGBA_MAX)
+        self.teleporter_pairer_graphic = pygame.transform.scale(self.teleporter_pairer_graphic, (self.TILE_SIZE, self.TILE_SIZE))
+        self.teleporter_pairer_cache = dict()
+
+
     def get_color_assigner_machine_by_color(self, color: pygame.Color) -> pygame.Surface:
         color = (color.r, color.g, color.b)
         if color not in self.color_assigner_machine_cache:
@@ -84,6 +94,14 @@ class Renderer:
             new_image.fill(color, special_flags=pygame.BLEND_RGBA_MULT)
             self.color_assigner_machine_cache[color] = new_image
         return self.color_assigner_machine_cache[color]
+
+    def get_teleporter_pairer_by_color(self, color: pygame.Color) -> pygame.Surface:
+        color = (color.r, color.g, color.b)
+        if color not in self.teleporter_pairer_cache:
+            new_image = self.teleporter_pairer_graphic.copy()
+            new_image.fill(color, special_flags=pygame.BLEND_RGBA_MULT)
+            self.teleporter_pairer_cache[color] = new_image
+        return self.teleporter_pairer_cache[color]
 
     def initialize_map(self):
         self.chart = []
@@ -109,6 +127,7 @@ class Renderer:
         self.carrying_item = None
         self.teleporting = None
         self.painting_block = None
+        self.painting_teleporter = None
 
     def initialize_my_surface(self):
         self.surface = pygame.Surface((self.width * self.TILE_SIZE, self.height * self.TILE_SIZE))
@@ -155,7 +174,7 @@ class Renderer:
                         ellipse_rect = pygame.Rect(w * self.TILE_SIZE, h * self.TILE_SIZE,
                             self.TILE_SIZE, self.TILE_SIZE)
                         ellipse_rect.inflate_ip(-self.TILE_SIZE // 2, -self.TILE_SIZE // 4)
-                        pygame.draw.ellipse(self.surface, color, ellipse_rect)
+                        pygame.draw.ellipse(self.surface, color, ellipse_rect, 0 if teleport_group != 'unpaired' else 2)
 
     def draw_blocks_on_ground(self):
         for h in range(self.height):
@@ -182,6 +201,12 @@ class Renderer:
                         color = tag.replace('color-assigner-machine-', '')
                         color = get_item_color('block', color, self.map_data)
                         self.surface.blit(self.get_color_assigner_machine_by_color(color), (w * self.TILE_SIZE, h * self.TILE_SIZE))
+                    if tag == 'teleport-unpairer':
+                        self.surface.blit(self.teleporter_unpairer_graphic, (w * self.TILE_SIZE, h * self.TILE_SIZE))
+                    if tag.startswith('teleport-pairer-'):
+                        color = tag.replace('teleport-pairer-', '')
+                        color = get_item_color('teleport', color, self.map_data)
+                        self.surface.blit(self.get_teleporter_pairer_by_color(color), (w * self.TILE_SIZE, h * self.TILE_SIZE))
 
 
     def draw_robot(self):
@@ -215,14 +240,35 @@ class Renderer:
 
         if self.carrying_item:
             type, item = self.carrying_item
-            if type == 'teleporter':
+            if type == 'teleporter' and not self.painting_teleporter:
                 # If the robot is holding a teleporter, draw a small version of it on top of the robot
                 color = get_item_color('teleport', item, self.map_data)
                 ellipse_rect = pygame.Rect(w * self.TILE_SIZE, h * self.TILE_SIZE,
                     self.TILE_SIZE, self.TILE_SIZE)
                 ellipse_rect.inflate_ip(-self.TILE_SIZE // 2, -self.TILE_SIZE // 4)
                 ellipse_rect.inflate_ip(-self.TILE_SIZE // 4, -self.TILE_SIZE // 8)
-                pygame.draw.ellipse(self.surface, color, ellipse_rect)
+                pygame.draw.ellipse(self.surface, color, ellipse_rect, 0 if item != 'unpaired' else 2)
+
+            elif type == 'teleporter' and self.painting_teleporter:
+                # If the robot is painting a teleporter, draw two copies: one with the old color and one with the new color
+                ellipse_rect = pygame.Rect(w * self.TILE_SIZE, h * self.TILE_SIZE,
+                    self.TILE_SIZE, self.TILE_SIZE)
+                ellipse_rect.inflate_ip(-self.TILE_SIZE // 2, -self.TILE_SIZE // 4)
+                ellipse_rect.inflate_ip(-self.TILE_SIZE // 4, -self.TILE_SIZE // 8)
+                ellipse_rect.move_ip(-self.TILE_SIZE // 6, 0)
+
+                old_color = get_item_color('teleport', item, self.map_data)
+                pygame.draw.ellipse(self.surface, old_color, ellipse_rect, 0 if item != 'unpaired' else 2)
+
+                new_color = get_item_color('teleport', self.painting_teleporter, self.map_data)
+                pygame.draw.ellipse(self.surface, new_color, ellipse_rect.move(self.TILE_SIZE // 3, 0), 0 if self.painting_teleporter != 'unpaired' else 2)
+
+                print("teleporter painting", item, self.painting_teleporter)
+
+                # After the teleporter is painted, we now hold a teleporter of the new color
+                self.carrying_item = ('teleporter', self.painting_teleporter)
+                self.painting_teleporter = None
+
 
             elif type == 'block' and not self.painting_block:
                 # If the robot is holding a block, draw a diamond on top of the robot
@@ -282,7 +328,12 @@ class Renderer:
         # (use_color_assigner_machine t2_0 bgroup_p) -- Use color assigner machine in tile 2,0 to assign color to block in group bgroup_p
         elif match := re.match(r'\(use_color_assigner_machine t(\d+)_(\d+) bgroup_(.+)\)', line):
             self.use_color_assigner_machine(int(match.group(1)), int(match.group(2)), match.group(3))
-
+        # (pair_tp t2_2 tgroup_p) -- Pair teleporter in tile 2,2 with teleporter in group tgroup_p
+        elif match := re.match(r'\(pair_tp t(\d+)_(\d+) tgroup_(.+)\)', line):
+            self.pair_teleporter(int(match.group(1)), int(match.group(2)), match.group(3))
+        # (unpair_tp t2_2 tgroup_p) -- Unpair teleporter in tile 2,2 from group tgroup_p
+        elif match := re.match(r'\(unpair_tp t(\d+)_(\d+) tgroup_(.+)\)', line):
+            self.unpair_teleporter(int(match.group(1)), int(match.group(2)))
         else:
             print('Unknown line:', line)
 
@@ -325,11 +376,19 @@ class Renderer:
     def use_color_assigner_machine(self, x, y, group):
         if self.robot_location == (x, y):
             self.painting_block = group
+    
+    def pair_teleporter(self, x, y, group):
+        if self.robot_location == (x, y):
+            self.painting_teleporter = group
+    
+    def unpair_teleporter(self, x, y):
+        if self.robot_location == (x, y):
+            self.painting_teleporter = 'unpaired'
 
 if __name__ == '__main__':
     map = json.load(open('current_map.json'))
     plan = open('sas_plan').read()
     presenter = FilePresenter('output')
-    presenter = ScreenPresenter()
+    #presenter = ScreenPresenter()
     renderer = Renderer(map, plan, presenter)
     renderer.run()

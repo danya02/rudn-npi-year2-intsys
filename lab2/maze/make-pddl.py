@@ -49,9 +49,17 @@ def emit_template(template):
                             group = tag.replace('color-assigner-machine-','')
                             print(f'  (color_assigner_machine_at t{w}_{h} bgroup_{group})')
                             print(f'  (item_at t{w}_{h}) ;; cannot place blocks on machines')
-                    
+                        if tag.startswith('teleport-pairer-'):
+                            group = tag.replace('teleport-pairer-','')
+                            print(f'  (teleport_pairer_at t{w}_{h} tgroup_{group})')
+                            print(f'  (item_at t{w}_{h}) ;; cannot place blocks on pairers')
+
                     if 'color-remover-machine' in cur_tile:
                         print(f'  (color_remover_machine_at t{w}_{h})')
+                        print(f'  (item_at t{w}_{h}) ;; cannot place blocks on machines')
+                    
+                    if 'teleport-unpairer' in cur_tile:
+                        print(f'  (teleport_unpairer_at t{w}_{h})')
                         print(f'  (item_at t{w}_{h}) ;; cannot place blocks on machines')
 
         elif '<!--TELEPORTGROUPS-->' in line:
