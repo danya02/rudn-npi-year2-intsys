@@ -22,16 +22,18 @@ def emit_template(template):
                 for w in range(len(chart[h])):
                     cur_tile = chart[h][w]
                     cur_tile = tiles[cur_tile]
-                    if h!=0:
-                        print(f'  (adjacent t{w}_{h} t{w}_{h-1})')
-                    if h!=len(chart)-1:
-                        print(f'  (adjacent t{w}_{h} t{w}_{h+1})')
-                    if w!=0:
-                        print(f'  (adjacent t{w}_{h} t{w-1}_{h})')
-                    if w!=len(chart[h])-1:
-                        print(f'  (adjacent t{w}_{h} t{w+1}_{h})')
-                    if 'walk' in cur_tile:
+                    if 'wall' not in cur_tile:
+                        # For optimization, we can not connect walls to adjacent tiles
+                        if h!=0:
+                            print(f'  (adjacent t{w}_{h} t{w}_{h-1})')
+                        if h!=len(chart)-1:
+                            print(f'  (adjacent t{w}_{h} t{w}_{h+1})')
+                        if w!=0:
+                            print(f'  (adjacent t{w}_{h} t{w-1}_{h})')
+                        if w!=len(chart[h])-1:
+                            print(f'  (adjacent t{w}_{h} t{w+1}_{h})')
                         print(f'  (walkable t{w}_{h})')
+
                     if 'start' in cur_tile:
                         print(f'  (at t{w}_{h})  ;; This is the tile that the agent starts on')
                     for tag in cur_tile:
@@ -43,6 +45,10 @@ def emit_template(template):
                             group = tag.replace('block-','')
                             print(f'  (block_at t{w}_{h} bgroup_{group})')
                             print(f'  (item_at t{w}_{h})')
+                        if tag.startswith('color-assigner-machine-'):
+                            group = tag.replace('color-assigner-machine-','')
+                            print(f'  (color_assigner_machine_at t{w}_{h} bgroup_{group})')
+                            print(f'  (item_at t{w}_{h}) ;; cannot place blocks on machines')
                     
                     if 'color-remover-machine' in cur_tile:
                         print(f'  (color_remover_machine_at t{w}_{h})')
@@ -75,9 +81,13 @@ def emit_template(template):
                     elif item.startswith("blocktarget-"):
                         group = item.replace('blocktarget-','')
                         groups.add(group)
-            
+                    elif item.startswith('color-assigner-machine-'):
+                        group = item.replace('color-assigner-machine-','')
+                        groups.add(group)
+
             for group in groups:
-                print(f' bgroup_{group} - block_group')
+                if group != 'colorless':  # already defined in domain
+                    print(f' bgroup_{group} - block_group')
 
         elif '<!--MAPGOALS-->' in line:
             maps = data

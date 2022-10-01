@@ -1,4 +1,4 @@
-all: domain.pddl color-remove-test
+all: domain.pddl color-trans-test
 
 domain.pddl: domain-template.pddl make-pddl.py
 	python make-pddl.py domain-template.pddl simple_maze.json > domain.pddl
@@ -20,6 +20,10 @@ color-remove-test: maze-template.pddl make-pddl.py color_remove_test.json
 	python make-pddl.py maze-template.pddl color_remove_test.json > current-map.pddl
 	cp color_remove_test.json current_map.json
 
+color-trans-test: maze-template.pddl make-pddl.py color_trans_test.json
+	python make-pddl.py maze-template.pddl color_trans_test.json > current-map.pddl
+	cp color_trans_test.json current_map.json
+
 
 clean:
 	rm -f domain.pddl simple-maze.pddl simple-move.pddl current_map.json current-map.pddl current-map.pddl.plan ff_plan sas_plan
@@ -28,8 +32,10 @@ clean:
 plan-convert:
 	python ff_plan_converter.py
 
-vis: all plan-convert
+visonly:
 	python visualizer.py
+
+vis: all plan-convert visonly
 
 gif: all
 	convert -delay 15 output/*.png output/animation.gif

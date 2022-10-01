@@ -1,0 +1,155 @@
+
+ff: parsing domain file
+domain 'MAZE' defined
+ ... done.
+ff: parsing problem file
+problem 'SIMPLE_MAZE' defined
+ ... done.
+
+
+
+Cueing down from goal distance:   30 into depth [1]
+                                  27            [1][2][3][4][5]
+                                  18            [1][2]
+                                  17            [1]
+                                  16            [1]
+                                  15            [1]
+                                  14            [1]
+                                  13            [1][2][3][4][5][6][7][8][9][10][11]
+
+Enforced Hill-climbing failed !
+switching to Best-first Search now.
+
+advancing to distance :   30
+                          27
+                          24
+                          22
+                          20
+                          17
+                          15
+                          13
+                          12
+                          10
+                           9
+                           8
+                           7
+                           6
+                           5
+                           4
+                           3
+                           2
+                           1
+                           0
+
+ff: found legal plan as follows
+
+step    0: MOVE T3_6 T2_6
+        1: MOVE T2_6 T1_6
+        2: MOVE T1_6 T1_5
+        3: MOVE T1_5 T1_4
+        4: MOVE T1_4 T1_3
+        5: MOVE T1_3 T1_2
+        6: MOVE T1_2 T0_2
+        7: PICK_UP_BLOCK T0_2 BGROUP_COLORLESS
+        8: MOVE T0_2 T1_2
+        9: MOVE T1_2 T1_1
+       10: MOVE T1_1 T2_1
+       11: MOVE T2_1 T3_1
+       12: MOVE T3_1 T4_1
+       13: MOVE T4_1 T5_1
+       14: MOVE T5_1 T6_1
+       15: USE_COLOR_ASSIGNER_MACHINE T6_1 BGROUP_B
+       16: MOVE T6_1 T6_2
+       17: MOVE T6_2 T6_3
+       18: MOVE T6_3 T6_4
+       19: MOVE T6_4 T6_5
+       20: DROP_BLOCK T6_5 BGROUP_B
+       21: MOVE T6_5 T6_4
+       22: MOVE T6_4 T6_3
+       23: MOVE T6_3 T6_2
+       24: MOVE T6_2 T6_1
+       25: MOVE T6_1 T5_1
+       26: MOVE T5_1 T4_1
+       27: MOVE T4_1 T3_1
+       28: MOVE T3_1 T2_1
+       29: MOVE T2_1 T1_1
+       30: MOVE T1_1 T0_1
+       31: PICK_UP_BLOCK T0_1 BGROUP_Y
+       32: MOVE T0_1 T1_1
+       33: MOVE T1_1 T2_1
+       34: MOVE T2_1 T3_1
+       35: MOVE T3_1 T3_0
+       36: USE_COLOR_REMOVER_MACHINE T3_0 BGROUP_Y
+       37: MOVE T3_0 T3_1
+       38: MOVE T3_1 T4_1
+       39: MOVE T4_1 T5_1
+       40: MOVE T5_1 T6_1
+       41: MOVE T6_1 T6_2
+       42: USE_COLOR_ASSIGNER_MACHINE T6_2 BGROUP_P
+       43: MOVE T6_2 T6_3
+       44: MOVE T6_3 T6_4
+       45: DROP_BLOCK T6_4 BGROUP_P
+       46: MOVE T6_4 T6_5
+       47: MOVE T6_5 T5_5
+       48: MOVE T5_5 T5_6
+       49: MOVE T5_6 T4_6
+       50: MOVE T4_6 T3_6
+       51: MOVE T3_6 T2_6
+       52: MOVE T2_6 T1_6
+       53: MOVE T1_6 T1_5
+       54: MOVE T1_5 T1_4
+       55: MOVE T1_4 T0_4
+       56: PICK_UP_BLOCK T0_4 BGROUP_K
+       57: MOVE T0_4 T1_4
+       58: MOVE T1_4 T1_3
+       59: MOVE T1_3 T1_2
+       60: MOVE T1_2 T1_1
+       61: MOVE T1_1 T2_1
+       62: MOVE T2_1 T3_1
+       63: MOVE T3_1 T3_0
+       64: USE_COLOR_REMOVER_MACHINE T3_0 BGROUP_K
+       65: MOVE T3_0 T3_1
+       66: MOVE T3_1 T4_1
+       67: MOVE T4_1 T5_1
+       68: MOVE T5_1 T5_2
+       69: MOVE T5_2 T5_3
+       70: MOVE T5_3 T6_3
+       71: DROP_BLOCK T6_3 BGROUP_COLORLESS
+       72: MOVE T6_3 T5_3
+       73: MOVE T5_3 T5_2
+       74: MOVE T5_2 T5_1
+       75: MOVE T5_1 T4_1
+       76: MOVE T4_1 T3_1
+       77: MOVE T3_1 T2_1
+       78: MOVE T2_1 T1_1
+       79: MOVE T1_1 T1_2
+       80: MOVE T1_2 T1_3
+       81: MOVE T1_3 T0_3
+       82: PICK_UP_BLOCK T0_3 BGROUP_L
+       83: MOVE T0_3 T1_3
+       84: MOVE T1_3 T1_2
+       85: MOVE T1_2 T1_1
+       86: MOVE T1_1 T2_1
+       87: MOVE T2_1 T3_1
+       88: MOVE T3_1 T3_0
+       89: USE_COLOR_REMOVER_MACHINE T3_0 BGROUP_L
+       90: MOVE T3_0 T3_1
+       91: DROP_BLOCK T3_1 BGROUP_COLORLESS
+       92: MOVE T3_1 T2_1
+       93: MOVE T2_1 T1_1
+       94: MOVE T1_1 T1_2
+       95: MOVE T1_2 T1_3
+       96: MOVE T1_3 T1_4
+       97: MOVE T1_4 T1_5
+       98: MOVE T1_5 T1_6
+       99: MOVE T1_6 T2_6
+      100: MOVE T2_6 T3_6
+     
+
+time spent:    0.00 seconds instantiating 4014 easy, 0 hard action templates
+               0.00 seconds reachability analysis, yielding 635 facts and 442 actions
+               0.00 seconds creating final representation with 478 relevant facts
+               0.00 seconds building connectivity graph
+               0.56 seconds searching, evaluating 12170 states, to a max depth of 11
+               0.56 seconds total time
+

@@ -71,6 +71,20 @@ class Renderer:
         self.color_remover_machine_graphic = pygame.image.load('gear_2699-fe0f.png')
         self.color_remover_machine_graphic = pygame.transform.scale(self.color_remover_machine_graphic, (self.TILE_SIZE, self.TILE_SIZE))
 
+        self.color_assigner_machine_graphic = pygame.image.load('paintbrush_1f58c-fe0f.png')
+        # make the image white
+        self.color_assigner_machine_graphic.fill((255,255,255,0), special_flags=pygame.BLEND_RGBA_MAX)
+        self.color_assigner_machine_graphic = pygame.transform.scale(self.color_assigner_machine_graphic, (self.TILE_SIZE, self.TILE_SIZE))
+        self.color_assigner_machine_cache = dict()
+
+    def get_color_assigner_machine_by_color(self, color: pygame.Color) -> pygame.Surface:
+        color = (color.r, color.g, color.b)
+        if color not in self.color_assigner_machine_cache:
+            new_image = self.color_assigner_machine_graphic.copy()
+            new_image.fill(color, special_flags=pygame.BLEND_RGBA_MULT)
+            self.color_assigner_machine_cache[color] = new_image
+        return self.color_assigner_machine_cache[color]
+
     def initialize_map(self):
         self.chart = []
         for row in self.map_data['chart']:
@@ -164,6 +178,10 @@ class Renderer:
                         self.surface.blit(self.robot_outline, (w * self.TILE_SIZE, h * self.TILE_SIZE))
                     if tag == 'color-remover-machine':
                         self.surface.blit(self.color_remover_machine_graphic, (w * self.TILE_SIZE, h * self.TILE_SIZE))
+                    if tag.startswith('color-assigner-machine-'):
+                        color = tag.replace('color-assigner-machine-', '')
+                        color = get_item_color('block', color, self.map_data)
+                        self.surface.blit(self.get_color_assigner_machine_by_color(color), (w * self.TILE_SIZE, h * self.TILE_SIZE))
 
 
     def draw_robot(self):
@@ -261,6 +279,10 @@ class Renderer:
         # (use_color_remover_machine t0_0 bgroup_a) -- Use color remover machine in tile 0,0 to remove color from block in group bgroup_a
         elif match := re.match(r'\(use_color_remover_machine t(\d+)_(\d+) bgroup_(.+)\)', line):
             self.use_color_remover_machine(int(match.group(1)), int(match.group(2)), match.group(3))
+        # (use_color_assigner_machine t2_0 bgroup_p) -- Use color assigner machine in tile 2,0 to assign color to block in group bgroup_p
+        elif match := re.match(r'\(use_color_assigner_machine t(\d+)_(\d+) bgroup_(.+)\)', line):
+            self.use_color_assigner_machine(int(match.group(1)), int(match.group(2)), match.group(3))
+
         else:
             print('Unknown line:', line)
 
@@ -299,11 +321,15 @@ class Renderer:
     def use_color_remover_machine(self, x, y, group):
         if self.robot_location == (x, y):
             self.painting_block = 'colorless'
+    
+    def use_color_assigner_machine(self, x, y, group):
+        if self.robot_location == (x, y):
+            self.painting_block = group
 
 if __name__ == '__main__':
     map = json.load(open('current_map.json'))
     plan = open('sas_plan').read()
     presenter = FilePresenter('output')
-    #presenter = ScreenPresenter()
+    presenter = ScreenPresenter()
     renderer = Renderer(map, plan, presenter)
     renderer.run()

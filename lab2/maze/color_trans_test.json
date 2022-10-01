@@ -1,0 +1,38 @@
+{
+    "chart":[
+        "x..M..x",
+        "Y..w..B",
+        "W.xxx.P",
+        "L.xxx.w",
+        "K.xxx.p",
+        "x.xxx.b",
+        "x..S..x"
+    ],
+    "tile_types": {
+        ".": ["walk"],
+        "S": ["start", "walk", "end"],
+        "w": ["walk", "blocktarget-colorless"],
+        "p": ["walk", "blocktarget-p"],
+        "b": ["walk", "blocktarget-b"],
+        "Y": ["walk", "block-y"],
+        "W": ["walk", "block-colorless"],
+        "L": ["walk", "block-l"],
+        "K": ["walk", "block-k"],
+
+        "M": ["walk", "color-remover-machine"],
+        "P": ["walk", "color-assigner-machine-p"],
+        "B": ["walk", "color-assigner-machine-b"],
+        "T": ["walk", "teleport-group-t"],
+        "x": ["wall"]
+    },
+    "fps": 5,
+    "colors":
+    {
+        "block-p": [245, 169, 184],
+        "block-b": [91, 206, 250],
+        "block-y": [252, 244, 52],
+        "block-l": [156, 89, 209],
+        "block-k": [44, 44, 44],
+        "teleport-group-t": [30, 30, 120]
+    }
+}
