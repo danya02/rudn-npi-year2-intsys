@@ -94,6 +94,16 @@ class Renderer:
         self.teleporter_pairer_graphic = pygame.transform.scale(self.teleporter_pairer_graphic, (self.TILE_SIZE, self.TILE_SIZE))
         self.teleporter_pairer_cache = dict()
 
+        # Lock icon from Twemoji, licensed under MIT
+        lock_graphic = pygame.image.load('locked_1f512.png')
+        # invert the image: make a hole in a white surface
+        lock_graphic.fill((255,255,255,0), special_flags=pygame.BLEND_RGBA_MAX) # now it is a white image on a transparent white background
+        #self.locked_graphic = pygame.Surface((self.TILE_SIZE, self.TILE_SIZE), pygame.SRCALPHA)
+        #self.locked_graphic.fill((255,255,255,255))  # this is a full white image
+        #self.locked_graphic.blit(lock_graphic, (0,0), special_flags=pygame.BLEND_RGBA_SUB)  # this subtracts the image from the background
+        self.locked_graphic = pygame.transform.scale(lock_graphic, (self.TILE_SIZE, self.TILE_SIZE))
+        self.locked_graphic_cache = dict()
+
 
     def get_color_assigner_machine_by_color(self, color: pygame.Color) -> pygame.Surface:
         color = (color.r, color.g, color.b)
@@ -110,6 +120,14 @@ class Renderer:
             new_image.fill(color, special_flags=pygame.BLEND_RGBA_MULT)
             self.teleporter_pairer_cache[color] = new_image
         return self.teleporter_pairer_cache[color]
+    
+    def get_gate_by_color(self, color: pygame.Color) -> pygame.Surface:
+        color = (color.r, color.g, color.b)
+        if color not in self.locked_graphic_cache:
+            new_image = self.locked_graphic.copy()
+            new_image.fill(color, special_flags=pygame.BLEND_RGBA_MULT)
+            self.locked_graphic_cache[color] = new_image
+        return self.locked_graphic_cache[color]
 
     def initialize_map(self):
         self.chart = []
@@ -136,6 +154,7 @@ class Renderer:
         self.teleporting = None
         self.painting_block = None
         self.painting_teleporter = None
+        self.unlocking_gate = None
 
     def initialize_my_surface(self):
         self.surface = pygame.Surface((self.width * self.TILE_SIZE, self.height * self.TILE_SIZE))
@@ -215,6 +234,10 @@ class Renderer:
                         color = tag.replace('teleport-pairer-', '')
                         color = get_item_color('teleport', color, self.map_data)
                         self.surface.blit(self.get_teleporter_pairer_by_color(color), (w * self.TILE_SIZE, h * self.TILE_SIZE))
+                    if tag.startswith('gate-'):
+                        color = tag.replace('gate-', '')
+                        color = get_item_color('block', color, self.map_data)
+                        self.surface.blit(self.get_gate_by_color(color), (w * self.TILE_SIZE, h * self.TILE_SIZE))
 
 
     def draw_robot(self):
@@ -308,10 +331,40 @@ class Renderer:
                 self.carrying_item = ('block', self.painting_block)
                 self.painting_block = None
 
+            if self.unlocking_gate:
+                gate_x, gate_y, gate_color = self.unlocking_gate
+                gate_img = self.get_gate_by_color(get_item_color('block', gate_color, self.map_data))
+
+                # Draw the gate image
+                self.surface.blit(gate_img, (gate_x * self.TILE_SIZE, gate_y * self.TILE_SIZE))
+                # Blank out the lower right triangle of the gate
+                left_top = (gate_x * self.TILE_SIZE, gate_y * self.TILE_SIZE)
+                right_top = (gate_x * self.TILE_SIZE + self.TILE_SIZE, gate_y * self.TILE_SIZE)
+                left_bottom = (gate_x * self.TILE_SIZE, gate_y * self.TILE_SIZE + self.TILE_SIZE)
+                right_bottom = (gate_x * self.TILE_SIZE + self.TILE_SIZE, gate_y * self.TILE_SIZE + self.TILE_SIZE)
+                pygame.draw.polygon(self.surface, 'black', [
+                    right_top, right_bottom, left_bottom
+                ])
+                # Draw the robot again
+                self.surface.blit(self.robot_graphic, (w * self.TILE_SIZE, h * self.TILE_SIZE))
+                # Draw the left half of the block on top of the robot
+                pygame.draw.polygon(self.surface, color, [
+                    (w * self.TILE_SIZE + self.TILE_SIZE // 2, h * self.TILE_SIZE + self.TILE_SIZE // 4),
+                    (w * self.TILE_SIZE + self.TILE_SIZE // 4, h * self.TILE_SIZE + self.TILE_SIZE // 2),
+                    (w * self.TILE_SIZE + self.TILE_SIZE // 2, h * self.TILE_SIZE + self.TILE_SIZE // 4 * 3),
+                ])
+
+                # Now the robot no longer holds the block
+                self.carrying_item = None
+                self.unlocking_gate = None
+                self.chart[gate_y][gate_x].remove('gate-' + gate_color)
+                    
+
 
 
     def execute_line(self, line):
         print(line)
+        pygame.display.set_caption(line)
         # (move t0_7 t1_7) -- Move robot from tile 0,7 to tile 1,7
         if match := re.match(r'\(move t(\d+)_(\d+) t(\d+)_(\d+)\)', line):
             self.move_robot(int(match.group(1)), int(match.group(2)), int(match.group(3)), int(match.group(4)))
@@ -342,6 +395,9 @@ class Renderer:
         # (unpair_tp t2_2 tgroup_p) -- Unpair teleporter in tile 2,2 from group tgroup_p
         elif match := re.match(r'\(unpair_tp t(\d+)_(\d+) tgroup_(.+)\)', line):
             self.unpair_teleporter(int(match.group(1)), int(match.group(2)))
+        # (unlock_gate t1_0 t1_1 bgroup_p) -- Unlock gate: while standing in 1,0 unlock the gate at 1,1 using block in group bgroup_p
+        elif match := re.match(r'\(unlock_gate t(\d+)_(\d+) t(\d+)_(\d+) bgroup_(.+)\)', line):
+            self.unlock_gate(int(match.group(1)), int(match.group(2)), int(match.group(3)), int(match.group(4)), match.group(5))
         else:
             print('Unknown line:', line)
 
@@ -392,6 +448,10 @@ class Renderer:
     def unpair_teleporter(self, x, y):
         if self.robot_location == (x, y):
             self.painting_teleporter = 'unpaired'
+    
+    def unlock_gate(self, from_x, from_y, to_x, to_y, group):
+        if self.robot_location == (from_x, from_y):
+            self.unlocking_gate = (to_x, to_y, group)
 
 if __name__ == '__main__':
     map = json.load(open('current_map.json'))

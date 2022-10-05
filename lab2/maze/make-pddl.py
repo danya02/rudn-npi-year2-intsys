@@ -22,6 +22,7 @@ def emit_template(template):
                 for w in range(len(chart[h])):
                     cur_tile = chart[h][w]
                     cur_tile = tiles[cur_tile]
+                    walkable = True # Every tile is walkable by default
                     if 'wall' not in cur_tile:
                         # For optimization, we can not connect walls to adjacent tiles
                         if h!=0:
@@ -32,7 +33,9 @@ def emit_template(template):
                             print(f'  (adjacent t{w}_{h} t{w-1}_{h})')
                         if w!=len(chart[h])-1:
                             print(f'  (adjacent t{w}_{h} t{w+1}_{h})')
-                        print(f'  (walkable t{w}_{h})')
+                    else:
+                        # If the tile is a wall, it is not walkable
+                        walkable = False 
 
                     if 'start' in cur_tile:
                         print(f'  (at t{w}_{h})  ;; This is the tile that the agent starts on')
@@ -53,6 +56,11 @@ def emit_template(template):
                             group = tag.replace('teleport-pairer-','')
                             print(f'  (teleport_pairer_at t{w}_{h} tgroup_{group})')
                             print(f'  (item_at t{w}_{h}) ;; cannot place blocks on pairers')
+                        if tag.startswith('gate-'):
+                            group = tag.replace('gate-','')
+                            print(f'  (gate_at t{w}_{h} bgroup_{group})')
+                            print(f'  (item_at t{w}_{h}) ;; cannot place blocks on gates')
+                            walkable = False # gates are not walkable
 
                     if 'color-remover-machine' in cur_tile:
                         print(f'  (color_remover_machine_at t{w}_{h})')
@@ -61,6 +69,9 @@ def emit_template(template):
                     if 'teleport-unpairer' in cur_tile:
                         print(f'  (teleport_unpairer_at t{w}_{h})')
                         print(f'  (item_at t{w}_{h}) ;; cannot place blocks on machines')
+
+                    if walkable:
+                        print(f'  (walkable t{w}_{h})')
 
         elif '<!--TELEPORTGROUPS-->' in line:
             maps = data
@@ -91,6 +102,9 @@ def emit_template(template):
                         groups.add(group)
                     elif item.startswith('color-assigner-machine-'):
                         group = item.replace('color-assigner-machine-','')
+                        groups.add(group)
+                    elif item.startswith('gate-'):
+                        group = item.replace('gate-','')
                         groups.add(group)
 
             for group in groups:

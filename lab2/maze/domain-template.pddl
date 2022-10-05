@@ -32,6 +32,9 @@
 
     (teleport_unpairer_at ?x - tile) ;; there is a teleporter unpairer on tile x
     (teleport_pairer_at ?x - tile ?group - teleport_group) ;; there is a teleporter pairer on tile x belonging to group
+
+    (gate_at ?x - tile ?group - block_group) ;; there is a gate on tile x belonging to group
+
 )
 
 
@@ -230,4 +233,29 @@
     )
 )
 
+(:action unlock_gate
+    ;; The agent is standing on a tile adjacent to a gate,
+    ;; and is holding a block of the same color as the gate,
+    ;; and unlocks the gate, destroying the block,
+    ;; removing the gate, and making the gate tile walkable
+
+    :parameters (
+        ?x - tile
+        ?y - tile
+        ?bgroup - block_group
+    )
+    :precondition (and
+        (at ?x)
+        (adjacent ?x ?y)
+        (gate_at ?y ?bgroup)
+        (holding_block ?bgroup)
+        (holding_item)
+    )
+    :effect (and
+        (not (gate_at ?y ?bgroup))
+        (not (holding_block ?bgroup))
+        (not (holding_item))
+        (walkable ?y)
+    )
+)
 )
