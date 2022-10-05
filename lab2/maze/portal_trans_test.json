@@ -1,8 +1,8 @@
 {
     "chart":[
-        ".1234.S",
-        "T......",
-        "..<?>..",
+        "T1234.S",
+        ".......",
+        "<..?..>",
         "#######",
         "k..#..P",
         "g..#..Y",
@@ -33,7 +33,7 @@
         "Y": ["walk", "block-yy"],
         "B": ["walk", "block-bb"],
 
-        "T": ["walk", "teleport-group-useless"],
+        "T": ["walk", "teleport-group-unused"],
         "#": ["wall"]
     },
     "fps": 5,
@@ -49,8 +49,6 @@
         "block-yy": [255, 216, 0],
         "block-bb": [33, 177, 255],
         "teleport-group-p": [181,126,220],
-        "teleport-group-g": [74,129,35],
-        "teleport-group-useless": [255, 255, 255]
-
+        "teleport-group-g": [74,129,35]
     }
 }

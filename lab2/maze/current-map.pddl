@@ -57,20 +57,22 @@
   t5_7 - tile
   t6_7 - tile
  tgroup_g - teleport_group
- tgroup_useless - teleport_group
+ tgroup_unused - teleport_group
  tgroup_p - teleport_group
- bgroup_l - block_group
- bgroup_pp - block_group
  bgroup_bb - block_group
+ bgroup_pp - block_group
+ bgroup_l - block_group
+ bgroup_k - block_group
  bgroup_yy - block_group
  bgroup_g - block_group
- bgroup_k - block_group
 )
 
 (:init
   (adjacent t0_0 t0_1)
   (adjacent t0_0 t1_0)
   (walkable t0_0)
+  (teleporter_at t0_0 tgroup_unused)
+  (item_at t0_0)
   (adjacent t1_0 t1_1)
   (adjacent t1_0 t0_0)
   (adjacent t1_0 t2_0)
@@ -99,8 +101,6 @@
   (adjacent t0_1 t0_2)
   (adjacent t0_1 t1_1)
   (walkable t0_1)
-  (teleporter_at t0_1 tgroup_useless)
-  (item_at t0_1)
   (adjacent t1_1 t1_0)
   (adjacent t1_1 t1_2)
   (adjacent t1_1 t0_1)
@@ -134,6 +134,8 @@
   (adjacent t0_2 t0_3)
   (adjacent t0_2 t1_2)
   (walkable t0_2)
+  (teleport_pairer_at t0_2 tgroup_p)
+  (item_at t0_2) ;; cannot place blocks on pairers
   (adjacent t1_2 t1_1)
   (adjacent t1_2 t1_3)
   (adjacent t1_2 t0_2)
@@ -144,8 +146,6 @@
   (adjacent t2_2 t1_2)
   (adjacent t2_2 t3_2)
   (walkable t2_2)
-  (teleport_pairer_at t2_2 tgroup_p)
-  (item_at t2_2) ;; cannot place blocks on pairers
   (adjacent t3_2 t3_1)
   (adjacent t3_2 t3_3)
   (adjacent t3_2 t2_2)
@@ -158,8 +158,6 @@
   (adjacent t4_2 t3_2)
   (adjacent t4_2 t5_2)
   (walkable t4_2)
-  (teleport_pairer_at t4_2 tgroup_g)
-  (item_at t4_2) ;; cannot place blocks on pairers
   (adjacent t5_2 t5_1)
   (adjacent t5_2 t5_3)
   (adjacent t5_2 t4_2)
@@ -169,6 +167,8 @@
   (adjacent t6_2 t6_3)
   (adjacent t6_2 t5_2)
   (walkable t6_2)
+  (teleport_pairer_at t6_2 tgroup_g)
+  (item_at t6_2) ;; cannot place blocks on pairers
   (adjacent t0_4 t0_3)
   (adjacent t0_4 t0_5)
   (adjacent t0_4 t1_4)

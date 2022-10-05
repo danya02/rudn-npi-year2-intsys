@@ -14,11 +14,12 @@ class Presenter:
         raise NotImplementedError
 
 class ScreenPresenter(Presenter):
-    def __init__(self):
+    def __init__(self, step_mode='auto'):
         self.screen = None
         self.frames = []
         self.clock = pygame.time.Clock()
         self.fps = 1
+        self.step_mode = step_mode
     
     def present_frame(self, frame: pygame.Surface, do_append=True):
         if self.screen is None:
@@ -27,11 +28,18 @@ class ScreenPresenter(Presenter):
             self.frames.append(frame.copy())
         self.screen.blit(frame, (0,0))
         pygame.display.flip()
-        self.clock.tick(self.fps)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+        it = True
+        while it or self.step_mode != 'auto':
+            it = False
+            self.clock.tick(self.fps)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                if event.type == pygame.KEYDOWN:
+                    if self.step_mode != 'auto':
+                        return
     
     def present_end(self):
         while True:
@@ -389,6 +397,6 @@ if __name__ == '__main__':
     map = json.load(open('current_map.json'))
     plan = open('sas_plan').read()
     presenter = FilePresenter('output')
-    #presenter = ScreenPresenter()
+    presenter = ScreenPresenter('manual')
     renderer = Renderer(map, plan, presenter)
     renderer.run()
