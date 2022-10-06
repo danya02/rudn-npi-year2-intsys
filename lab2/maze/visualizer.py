@@ -14,14 +14,17 @@ class Presenter:
         raise NotImplementedError
 
 class ScreenPresenter(Presenter):
-    def __init__(self, step_mode='auto'):
+    def __init__(self, step_mode='auto', loop=True):
         self.screen = None
         self.frames = []
         self.clock = pygame.time.Clock()
         self.fps = 1
         self.step_mode = step_mode
+        self.loop = loop
+        self.skipping_all = False
     
     def present_frame(self, frame: pygame.Surface, do_append=True):
+        if self.skipping_all: return
         if self.screen is None:
             self.screen = pygame.display.set_mode((frame.get_width(), frame.get_height()))
         if do_append:
@@ -38,11 +41,13 @@ class ScreenPresenter(Presenter):
                     pygame.quit()
                     exit()
                 if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.skipping_all = True
                     if self.step_mode != 'auto':
                         return
     
     def present_end(self):
-        while True:
+        while self.loop:
             self.screen.fill('black')
             pygame.display.flip()
             self.clock.tick(1)
@@ -294,7 +299,6 @@ class Renderer:
                 new_color = get_item_color('teleport', self.painting_teleporter, self.map_data)
                 pygame.draw.ellipse(self.surface, new_color, ellipse_rect.move(self.TILE_SIZE // 3, 0), 0 if self.painting_teleporter != 'unpaired' else 2)
 
-                print("teleporter painting", item, self.painting_teleporter)
 
                 # After the teleporter is painted, we now hold a teleporter of the new color
                 self.carrying_item = ('teleporter', self.painting_teleporter)
@@ -405,59 +409,69 @@ class Renderer:
     def move_robot(self, from_x, from_y, to_x, to_y):
         if self.robot_location == (from_x, from_y):
             self.robot_location = (to_x, to_y)
+            print("Иду в ", to_x, to_y)
     
     def use_teleporter(self, from_x, from_y, to_x, to_y, group):
         self.teleporting = (to_x, to_y)
+        print("Телепортируюсь в ", to_x, to_y, "с помощью портала", group)
     
     def pick_up_block(self, x, y, group):
         print(x, y, self.robot_location, 'pick up')
         if self.robot_location == (x, y):
             self.carrying_item = ('block', group)
-            print('Now carrying', self.carrying_item)
             self.chart[y][x].remove(f'block-{group}')
+            print("Подобрал блок группы", group)
     
     def drop_block(self, x, y, group):
         print(x, y, self.robot_location, 'drop')
         if self.robot_location == (x, y):
-            print('No longer carrying', self.carrying_item)
             self.carrying_item = None
             self.chart[y][x].append(f'block-{group}')
+            print("Бросил блок группы", group)
 
     def pick_up_teleporter(self, x, y, group):
         if self.robot_location == (x, y):
             self.carrying_item = ('teleporter', group)
             self.chart[y][x].remove(f'teleport-group-{group}')
+            print("Подобрал портал группы", group)
     
     def drop_teleporter(self, x, y, group):
         if self.robot_location == (x, y):
             self.carrying_item = None
             self.chart[y][x].append(f'teleport-group-{group}')
-    
+            print("Бросил портал группы", group)
+
     def use_color_remover_machine(self, x, y, group):
         if self.robot_location == (x, y):
             self.painting_block = 'colorless'
+            print("Снимаю цвет с блока группы", group)
     
     def use_color_assigner_machine(self, x, y, group):
         if self.robot_location == (x, y):
             self.painting_block = group
+            print("Наношу цвет группы", group, "на блок")
     
     def pair_teleporter(self, x, y, group):
         if self.robot_location == (x, y):
             self.painting_teleporter = group
-    
+            print("Привязываю портал к группе", group)
+
     def unpair_teleporter(self, x, y):
         if self.robot_location == (x, y):
             self.painting_teleporter = 'unpaired'
-    
+            print("Отвязываю портал от его группы")
+ 
     def unlock_gate(self, from_x, from_y, to_x, to_y, group):
         if self.robot_location == (from_x, from_y):
             self.unlocking_gate = (to_x, to_y, group)
+            print("Открываю дверь в", to_x, to_y, "с помощью блока группы", group)
 
 if __name__ == '__main__':
-    map_name = 'gate-test.json'
-    map = json.load(open('problems/' + map_name))
-    plan = open('plans/' + map_name + '.plan').read()
-    presenter = FilePresenter('output')
-    presenter = ScreenPresenter()
-    renderer = Renderer(map, plan, presenter)
-    renderer.run()
+    import os
+    for map_name in os.listdir('problems'):
+        map = json.load(open('problems/' + map_name))
+        plan = open('plans/' + map_name + '.plan').read()
+        presenter = FilePresenter('output')
+        presenter = ScreenPresenter(loop=False)
+        renderer = Renderer(map, plan, presenter)
+        renderer.run()

@@ -31,6 +31,6 @@
         "block-b": [255, 255, 0],
         "block-c": [0, 255, 0],
         "block-d": [128, 0, 255],
-        "teleport-group-t": [0, 0, 255]
+        "teleport-t": [0, 0, 255]
     }
 }

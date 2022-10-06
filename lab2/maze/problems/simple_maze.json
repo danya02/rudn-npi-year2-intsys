@@ -18,5 +18,10 @@
         "F": ["teleport-group-F", "walk"],
         "x": ["wall"]
     },
-    "fps": 5
+    "fps": 5,
+    "colors": {
+        "teleport-t": [128, 0, 255],
+        "teleport-a": [255, 255, 0],
+        "teleport-f": [0, 255, 0]
+    }
 }

@@ -48,7 +48,7 @@
         "block-pp": [255, 33, 140],
         "block-yy": [255, 216, 0],
         "block-bb": [33, 177, 255],
-        "teleport-group-p": [181,126,220],
-        "teleport-group-g": [74,129,35]
+        "teleport-p": [181,126,220],
+        "teleport-g": [74,129,35]
     }
 }
