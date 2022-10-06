@@ -457,6 +457,6 @@ if __name__ == '__main__':
     map = json.load(open('current_map.json'))
     plan = open('sas_plan').read()
     presenter = FilePresenter('output')
-    presenter = ScreenPresenter('manual')
+    presenter = ScreenPresenter()
     renderer = Renderer(map, plan, presenter)
     renderer.run()

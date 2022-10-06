@@ -66,8 +66,8 @@
   t15_3 - tile
  tgroup_t - teleport_group
  bgroup_d - block_group
- bgroup_b - block_group
  bgroup_a - block_group
+ bgroup_b - block_group
  bgroup_c - block_group
 )
 
@@ -342,6 +342,8 @@
 )
 
 (:goal (and
+  (block_at t14_2 bgroup_d)
+  (block_at t15_2 bgroup_d)
   (block_at t7_3 bgroup_d)
   (at t15_3)  ;; This is the tile that the agent should end on
 
