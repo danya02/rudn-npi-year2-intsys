@@ -454,8 +454,9 @@ class Renderer:
             self.unlocking_gate = (to_x, to_y, group)
 
 if __name__ == '__main__':
-    map = json.load(open('current_map.json'))
-    plan = open('sas_plan').read()
+    map_name = 'gate-test.json'
+    map = json.load(open('problems/' + map_name))
+    plan = open('plans/' + map_name + '.plan').read()
     presenter = FilePresenter('output')
     presenter = ScreenPresenter()
     renderer = Renderer(map, plan, presenter)
