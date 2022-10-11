@@ -468,7 +468,9 @@ class Renderer:
 
 if __name__ == '__main__':
     import os
-    for map_name in os.listdir('problems'):
+    import sys
+    if sys.argv[1] + '.json' in os.listdir('problems'):
+        map_name = sys.argv[1] + '.json'
         map = json.load(open('problems/' + map_name))
         plan = open('plans/' + map_name + '.plan').read()
         presenter = FilePresenter('output')
