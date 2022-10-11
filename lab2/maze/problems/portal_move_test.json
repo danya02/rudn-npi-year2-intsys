@@ -10,7 +10,7 @@
     ],
     "tile_types": {
         ".": ["walk"],
-        "S": ["start", "walk", "end"],
+        "S": ["start-a", "walk", "end-a"],
         "A": ["walk", "block-a"],
         "a": ["walk", "blocktarget-a"],
         "T": ["walk", "teleport-group-1"],

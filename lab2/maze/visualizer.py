@@ -13,6 +13,8 @@ class Presenter:
     def present_end(self):
         raise NotImplementedError
 
+class Null: pass
+
 class ScreenPresenter(Presenter):
     def __init__(self, step_mode='auto', loop=True):
         self.screen = None
@@ -72,6 +74,7 @@ class Renderer:
         self.presenter.fps = map_data.get('fps', 1)
         self.map_data = map_data
         self.plan = plan.splitlines()
+        self.robot_states = {}
         self.initialize_map()
         self.initialize_state()
         self.initialize_my_surface()
@@ -136,6 +139,7 @@ class Renderer:
 
     def initialize_map(self):
         self.chart = []
+        self.robots = []
         for row in self.map_data['chart']:
             chart_row = []
             for cell_type in row:
@@ -145,21 +149,84 @@ class Renderer:
                     new_cell_tags.append(tag.lower())
                 chart_row.append(new_cell_tags)
             self.chart.append(chart_row)
-        self.robot_location = None
+
         for h in range(len(self.chart)):
             for w in range(len(self.chart[h])):
-                if 'start' in self.chart[h][w]:
-                    self.robot_location = (w,h)
-                    break
+                for tag in self.chart[h][w]:
+                    if tag.startswith('start-'):
+                        robot_name = tag.replace('start-', '')
+                        self.robots.append(robot_name)
+                        print(robot_name, w, h)
+
+                        self.robot_states[robot_name] = Null()
+                        self.robot_states[robot_name].location = (w, h)
+
         self.width = len(self.chart[0])
         self.height = len(self.chart)
     
     def initialize_state(self):
-        self.carrying_item = None
-        self.teleporting = None
-        self.painting_block = None
-        self.painting_teleporter = None
-        self.unlocking_gate = None
+        self.active_robot = None
+        print(self.robot_states)
+        for robot in self.robots:
+            self.robot_states[robot].carrying_item = None
+            self.robot_states[robot].teleporting = None
+            self.robot_states[robot].painting_block = None
+            self.robot_states[robot].painting_teleporter = None
+            self.robot_states[robot].unlocking_gate = None
+
+    @property
+    def robot_location(self):
+        return self.robot_states[self.active_robot].location
+    
+    @robot_location.setter
+    def robot_location(self, value):
+        self.robot_states[self.active_robot].location = value
+    
+    @property
+    def carrying_item(self):
+        return self.robot_states[self.active_robot].carrying_item
+    
+    @carrying_item.setter
+    def carrying_item(self, value):
+        self.robot_states[self.active_robot].carrying_item = value
+
+    @property
+    def teleporting(self):
+        return self.robot_states[self.active_robot].teleporting
+
+    @teleporting.setter
+    def teleporting(self, value):
+        self.robot_states[self.active_robot].teleporting = value
+
+    @property
+    def painting_block(self):
+        return self.robot_states[self.active_robot].painting_block
+
+    @painting_block.setter
+    def painting_block(self, value):
+        self.robot_states[self.active_robot].painting_block = value
+
+    @property
+    def painting_teleporter(self):
+        return self.robot_states[self.active_robot].painting_teleporter
+
+    @painting_teleporter.setter
+    def painting_teleporter(self, value):
+        self.robot_states[self.active_robot].painting_teleporter = value
+
+    @property
+    def unlocking_gate(self):
+        return self.robot_states[self.active_robot].unlocking_gate
+
+    @unlocking_gate.setter
+    def unlocking_gate(self, value):
+        self.robot_states[self.active_robot].unlocking_gate = value
+
+    
+    def switch_context(self, robot):
+        print('switching context to', robot)
+        self.active_robot = robot.replace('robot_', '')
+
 
     def initialize_my_surface(self):
         self.surface = pygame.Surface((self.width * self.TILE_SIZE, self.height * self.TILE_SIZE))
@@ -225,7 +292,7 @@ class Renderer:
                         rect.inflate_ip(-self.TILE_SIZE // 4, -self.TILE_SIZE // 4)
                         rect.inflate_ip(+self.TILE_SIZE // 8, +self.TILE_SIZE // 8)
                         pygame.draw.rect(self.surface, color, rect, 2)
-                    if tag == 'end':
+                    if tag.startswith('end-'):
                         self.surface.blit(self.robot_outline, (w * self.TILE_SIZE, h * self.TILE_SIZE))
                     if tag == 'color-remover-machine':
                         self.surface.blit(self.color_remover_machine_graphic, (w * self.TILE_SIZE, h * self.TILE_SIZE))
@@ -246,6 +313,11 @@ class Renderer:
 
 
     def draw_robot(self):
+        for robot_name in self.robot_states:
+            self.draw_single_robot(robot_name)
+
+    def draw_single_robot(self, robot_name):
+        self.switch_context(robot_name)
         w,h = self.robot_location
         if not self.teleporting:
             # If not teleporting, draw the robot at its location
@@ -369,99 +441,121 @@ class Renderer:
     def execute_line(self, line):
         print(line)
         pygame.display.set_caption(line)
-        # (move t0_7 t1_7) -- Move robot from tile 0,7 to tile 1,7
-        if match := re.match(r'\(move t(\d+)_(\d+) t(\d+)_(\d+)\)', line):
-            self.move_robot(int(match.group(1)), int(match.group(2)), int(match.group(3)), int(match.group(4)))
-        # (use_teleporter t4_7 t4_0 tgroup_a) -- Use teleporter in tile 4,7 to teleport to tile 4,0 in tgroup_a
-        elif match := re.match(r'\(use_teleporter t(\d+)_(\d+) t(\d+)_(\d+) tgroup_(.+)\)', line):
-            self.use_teleporter(int(match.group(1)), int(match.group(2)), int(match.group(3)), int(match.group(4)), match.group(5))
-        # (pick_up_block t0_0 bgroup_a) -- Pixk up block in tile 0,0 from group bgroup_a
-        elif match := re.match(r'\(pick_up_block t(\d+)_(\d+) bgroup_(.+)\)', line):
-            self.pick_up_block(int(match.group(1)), int(match.group(2)), match.group(3))
-        # (drop_block t7_6 bgroup_a) -- Drop block in tile 7,6 in group bgroup_a
-        elif match := re.match(r'\(drop_block t(\d+)_(\d+) bgroup_(.+)\)', line):
-            self.drop_block(int(match.group(1)), int(match.group(2)), match.group(3))
-        # (pick_up_tp t6_0 tgroup_1) -- Pick up teleporter in tile 6,0 from group tgroup_1
-        elif match := re.match(r'\(pick_up_tp t(\d+)_(\d+) tgroup_(.+)\)', line):
-            self.pick_up_teleporter(int(match.group(1)), int(match.group(2)), match.group(3))
-        # (drop_tp t6_0 tgroup_1) -- Drop teleporter in tile 6,0 in group tgroup_1
-        elif match := re.match(r'\(drop_tp t(\d+)_(\d+) tgroup_(.+)\)', line):
-            self.drop_teleporter(int(match.group(1)), int(match.group(2)), match.group(3))
-        # (use_color_remover_machine t0_0 bgroup_a) -- Use color remover machine in tile 0,0 to remove color from block in group bgroup_a
-        elif match := re.match(r'\(use_color_remover_machine t(\d+)_(\d+) bgroup_(.+)\)', line):
-            self.use_color_remover_machine(int(match.group(1)), int(match.group(2)), match.group(3))
-        # (use_color_assigner_machine t2_0 bgroup_p) -- Use color assigner machine in tile 2,0 to assign color to block in group bgroup_p
-        elif match := re.match(r'\(use_color_assigner_machine t(\d+)_(\d+) bgroup_(.+)\)', line):
-            self.use_color_assigner_machine(int(match.group(1)), int(match.group(2)), match.group(3))
-        # (pair_tp t2_2 tgroup_p) -- Pair teleporter in tile 2,2 with teleporter in group tgroup_p
-        elif match := re.match(r'\(pair_tp t(\d+)_(\d+) tgroup_(.+)\)', line):
-            self.pair_teleporter(int(match.group(1)), int(match.group(2)), match.group(3))
-        # (unpair_tp t2_2 tgroup_p) -- Unpair teleporter in tile 2,2 from group tgroup_p
-        elif match := re.match(r'\(unpair_tp t(\d+)_(\d+) tgroup_(.+)\)', line):
-            self.unpair_teleporter(int(match.group(1)), int(match.group(2)))
-        # (unlock_gate t1_0 t1_1 bgroup_p) -- Unlock gate: while standing in 1,0 unlock the gate at 1,1 using block in group bgroup_p
-        elif match := re.match(r'\(unlock_gate t(\d+)_(\d+) t(\d+)_(\d+) bgroup_(.+)\)', line):
-            self.unlock_gate(int(match.group(1)), int(match.group(2)), int(match.group(3)), int(match.group(4)), match.group(5))
+        # (move r_main t0_7 t1_7) -- Move robot main from tile 0,7 to tile 1,7
+        if match := re.match(r'\(move (\w+) t(\d+)_(\d+) t(\d+)_(\d+)\)', line):
+            robot_name, from_x, from_y, to_x, to_y = match.groups()
+            self.move_robot(robot_name, int(from_x), int(from_y), int(to_x), int(to_y))
+        # (use_teleporter r_main t4_7 t4_0 tgroup_a) -- robot main use teleporter in tile 4,7 to teleport to tile 4,0 in tgroup_a
+        elif match := re.match(r'\(use_teleporter (\w+) t(\d+)_(\d+) t(\d+)_(\d+) tgroup_(\w+)\)', line):
+            robot_name, from_x, from_y, to_x, to_y, teleporter_group = match.groups()
+            self.use_teleporter(robot_name, int(from_x), int(from_y), int(to_x), int(to_y), teleporter_group)
+        # (pick_up_block r_main t0_0 bgroup_a) -- robot main picks up block in tile 0,0 from group bgroup_a
+        elif match := re.match(r'\(pick_up_block (\w+) t(\d+)_(\d+) bgroup_(\w+)\)', line):
+            robot_name, x, y, block_group = match.groups()
+            self.pick_up_block(robot_name, int(x), int(y), block_group)
+        # (drop_block r_main t7_6 bgroup_a) -- robot main drops block in tile 7,6 in group bgroup_a
+        elif match := re.match(r'\(drop_block (\w+) t(\d+)_(\d+) bgroup_(\w+)\)', line):
+            robot_name, x, y, block_group = match.groups()
+            self.drop_block(robot_name, int(x), int(y), block_group)
+        # (pick_up_tp r_main t6_0 tgroup_1) -- robot main picks up teleporter in tile 6,0 from group tgroup_1
+        elif match := re.match(r'\(pick_up_tp (\w+) t(\d+)_(\d+) tgroup_(\w+)\)', line):
+            robot_name, x, y, teleporter_group = match.groups()
+            self.pick_up_teleporter(robot_name, int(x), int(y), teleporter_group)
+        # (drop_tp r_main t6_0 tgroup_1) -- robot main drops teleporter in tile 6,0 in group tgroup_1
+        elif match := re.match(r'\(drop_tp (\w+) t(\d+)_(\d+) tgroup_(\w+)\)', line):
+            robot_name, x, y, teleporter_group = match.groups()
+            self.drop_teleporter(robot_name, int(x), int(y), teleporter_group)
+        # (use_color_remover_machine r_main t0_0 bgroup_a) -- robot main uses color remover machine in tile 0,0 to remove color from block in group bgroup_a
+        elif match := re.match(r'\(use_color_remover_machine (\w+) t(\d+)_(\d+) bgroup_(\w+)\)', line):
+            robot_name, x, y, block_group = match.groups()
+            self.use_color_remover_machine(robot_name, int(x), int(y), block_group)
+        # (use_color_assigner_machine r_main t2_0 bgroup_p) -- robot main uses color assigner machine in tile 2,0 to assign color to block in group bgroup_p
+        elif match := re.match(r'\(use_color_assigner_machine (\w+) t(\d+)_(\d+) bgroup_(\w+)\)', line):
+            robot_name, x, y, block_group = match.groups()
+            self.use_color_assigner_machine(robot_name, int(x), int(y), block_group)
+        # (pair_tp r_main t2_2 tgroup_p) -- Pair teleporter in tile 2,2 with teleporter in group tgroup_p
+        elif match := re.match(r'\(pair_tp (\w+) t(\d+)_(\d+) tgroup_(\w+)\)', line):
+            robot_name, x, y, teleporter_group = match.groups()
+            self.pair_teleporter(robot_name, int(x), int(y), teleporter_group)
+        # (unpair_tp r_main t2_2 tgroup_p) -- Unpair teleporter in tile 2,2 from group tgroup_p
+        elif match := re.match(r'\(unpair_tp (\w+) t(\d+)_(\d+) tgroup_(\w+)\)', line):
+            robot_name, x, y, teleporter_group = match.groups()
+            self.unpair_teleporter(robot_name, int(x), int(y), teleporter_group)
+        # (unlock_gate r_main t1_0 t1_1 bgroup_p) -- Unlock gate: while standing in 1,0 unlock the gate at 1,1 using block in group bgroup_p
+        elif match := re.match(r'\(unlock_gate (\w+) t(\d+)_(\d+) t(\d+)_(\d+) bgroup_(\w+)\)', line):
+            robot_name, robot_x, robot_y, gate_x, gate_y, block_group = match.groups()
+            self.unlock_gate(robot_name, int(robot_x), int(robot_y), int(gate_x), int(gate_y), block_group)
         else:
             print('Unknown line:', line)
 
     
-    def move_robot(self, from_x, from_y, to_x, to_y):
+    def move_robot(self, robot_name, from_x, from_y, to_x, to_y):
+        self.switch_context(robot_name)
         if self.robot_location == (from_x, from_y):
             self.robot_location = (to_x, to_y)
             print("Иду в ", to_x, to_y)
     
-    def use_teleporter(self, from_x, from_y, to_x, to_y, group):
+    def use_teleporter(self, robot_name, from_x, from_y, to_x, to_y, group):
+        self.switch_context(robot_name)
         self.teleporting = (to_x, to_y)
         print("Телепортируюсь в ", to_x, to_y, "с помощью портала", group)
     
-    def pick_up_block(self, x, y, group):
+    def pick_up_block(self, robot_name, x, y, group):
+        self.switch_context(robot_name)
         print(x, y, self.robot_location, 'pick up')
         if self.robot_location == (x, y):
             self.carrying_item = ('block', group)
             self.chart[y][x].remove(f'block-{group}')
             print("Подобрал блок группы", group)
     
-    def drop_block(self, x, y, group):
+    def drop_block(self, robot_name, x, y, group):
+        self.switch_context(robot_name)
         print(x, y, self.robot_location, 'drop')
         if self.robot_location == (x, y):
             self.carrying_item = None
             self.chart[y][x].append(f'block-{group}')
             print("Бросил блок группы", group)
 
-    def pick_up_teleporter(self, x, y, group):
+    def pick_up_teleporter(self, robot_name, x, y, group):
+        self.switch_context(robot_name)
         if self.robot_location == (x, y):
             self.carrying_item = ('teleporter', group)
             self.chart[y][x].remove(f'teleport-group-{group}')
             print("Подобрал портал группы", group)
     
-    def drop_teleporter(self, x, y, group):
+    def drop_teleporter(self, robot_name, x, y, group):
+        self.switch_context(robot_name)
         if self.robot_location == (x, y):
             self.carrying_item = None
             self.chart[y][x].append(f'teleport-group-{group}')
             print("Бросил портал группы", group)
 
-    def use_color_remover_machine(self, x, y, group):
+    def use_color_remover_machine(self, robot_name, x, y, group):
+        self.switch_context(robot_name)
         if self.robot_location == (x, y):
             self.painting_block = 'colorless'
             print("Снимаю цвет с блока группы", group)
     
-    def use_color_assigner_machine(self, x, y, group):
+    def use_color_assigner_machine(self, robot_name, x, y, group):
+        self.switch_context(robot_name)
         if self.robot_location == (x, y):
             self.painting_block = group
             print("Наношу цвет группы", group, "на блок")
     
-    def pair_teleporter(self, x, y, group):
+    def pair_teleporter(self, robot_name, x, y, group):
+        self.switch_context(robot_name)
         if self.robot_location == (x, y):
             self.painting_teleporter = group
             print("Привязываю портал к группе", group)
 
-    def unpair_teleporter(self, x, y):
+    def unpair_teleporter(self, robot_name, x, y):
+        self.switch_context(robot_name)
         if self.robot_location == (x, y):
             self.painting_teleporter = 'unpaired'
             print("Отвязываю портал от его группы")
  
-    def unlock_gate(self, from_x, from_y, to_x, to_y, group):
+    def unlock_gate(self, robot_name, from_x, from_y, to_x, to_y, group):
+        self.switch_context(robot_name)
         if self.robot_location == (from_x, from_y):
             self.unlocking_gate = (to_x, to_y, group)
             print("Открываю дверь в", to_x, to_y, "с помощью блока группы", group)
@@ -477,3 +571,5 @@ if __name__ == '__main__':
         presenter = ScreenPresenter(loop=False)
         renderer = Renderer(map, plan, presenter)
         renderer.run()
+    else:
+        print('No such map')

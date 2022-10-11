@@ -37,8 +37,6 @@ def emit_template(template):
                         # If the tile is a wall, it is not walkable
                         walkable = False 
 
-                    if 'start' in cur_tile:
-                        print(f'  (at t{w}_{h})  ;; This is the tile that the agent starts on')
                     for tag in cur_tile:
                         if tag.startswith('teleport-group-'):
                             group = tag.replace('teleport-group-','')
@@ -62,6 +60,12 @@ def emit_template(template):
                             print(f'  (item_at t{w}_{h}) ;; cannot place blocks on gates')
                             walkable = False # gates are not walkable
 
+                        if tag.startswith('start-'):
+                            robot_name = tag.replace('start-','')
+                            print(f'  (at robot_{robot_name} t{w}_{h})')
+                        
+
+
                     if 'color-remover-machine' in cur_tile:
                         print(f'  (color_remover_machine_at t{w}_{h})')
                         print(f'  (item_at t{w}_{h}) ;; cannot place blocks on machines')
@@ -72,6 +76,7 @@ def emit_template(template):
 
                     if walkable:
                         print(f'  (walkable t{w}_{h})')
+                    
 
         elif '<!--TELEPORTGROUPS-->' in line:
             maps = data
@@ -111,6 +116,23 @@ def emit_template(template):
                 if group != 'colorless':  # already defined in domain
                     print(f' bgroup_{group} - block_group')
 
+        elif '<!--ROBOTS-->' in line:
+            maps = data
+            chart = maps['chart']
+            tiles = maps['tile_types']
+            robots = []
+            for tile in tiles:
+                conf = tiles[tile]
+                for item in conf:
+                    if item.startswith('start-'):
+                        robot_name = item.replace('start-','')
+                        robots.append(robot_name)
+                    elif item.startswith('end-'):
+                        robot_name = item.replace('end-','')
+                        robots.append(robot_name)
+            for robot in set(robots):
+                print(f'  robot_{robot} - robot')
+
         elif '<!--MAPGOALS-->' in line:
             maps = data
             chart = maps['chart']
@@ -120,12 +142,15 @@ def emit_template(template):
                 for w in range(len(chart[h])):
                     cur_tile = chart[h][w]
                     cur_tile = tiles[cur_tile]
-                    if 'end' in cur_tile:
-                        print(f'  (at t{w}_{h})  ;; This is the tile that the agent should end on')
                     for tag in cur_tile:
                         if tag.startswith('blocktarget-'):
                             group = tag.replace('blocktarget-','')
                             print(f'  (block_at t{w}_{h} bgroup_{group})')
+
+                        if tag.startswith('end-'):
+                            robot_name = tag.replace('end-','')
+                            print(f'  (at robot_{robot_name} t{w}_{h})')
+
 
         elif '<!--include-->' in line:
             file_to_include = line.split(';')[-1]

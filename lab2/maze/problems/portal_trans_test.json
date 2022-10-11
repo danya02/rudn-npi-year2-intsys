@@ -11,7 +11,7 @@
     ],
     "tile_types": {
         ".": ["walk"],
-        "S": ["start", "walk", "end"],
+        "S": ["start-a", "walk", "end-a"],
         "?": ["walk", "teleport-unpairer"],
         "<": ["walk", "teleport-pairer-p"],
         ">": ["walk", "teleport-pairer-g"],

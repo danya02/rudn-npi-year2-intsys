@@ -10,7 +10,7 @@
     ],
     "tile_types": {
         ".": ["walk"],
-        "S": ["start", "walk", "end"],
+        "S": ["start-a", "walk", "end-a"],
         "A": ["walk", "block-a"],
         "B": ["walk", "block-b"],
         "C": ["walk", "block-c"],

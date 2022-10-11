@@ -3,6 +3,7 @@
     ;; <!--MAPLIST-->
     ;; <!--TELEPORTGROUPS-->
     ;; <!--BLOCKGROUPS-->
+    ;; <!--ROBOTS-->
 )
 
 (:init

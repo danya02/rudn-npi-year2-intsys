@@ -1,0 +1,25 @@
+{
+    "chart":[
+        "bbbbbbbbb",
+        ".v.....^.",
+        "xxxxxxxxx",
+        ".v.xx_.^.",
+        "..._xx...",
+        "...xx_...",
+        "..._xx...",
+        "A..xx_..B"
+    ],
+    "tile_types": {
+        ".": ["walk"],
+        "A": ["start-a", "walk", "end-a"],
+        "B": ["end-b", "walk", "start-b"],
+        "^": ["teleport-group-Q", "walk"],
+        "v": ["teleport-group-W", "walk"],
+        "_": ["blocktarget-colorless", "walk"],
+        "b": ["block-colorless", "walk"],
+        "x": ["wall"]
+    },
+    "fps": 5,
+    "colors": {
+    }
+}
