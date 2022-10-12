@@ -1,0 +1,45 @@
+{
+    "chart":[
+        "b._xb._xb._",
+        "...x...x...",
+        "1.qx2.wx3.e",
+        "xxxxxxxxxxx",
+        "b._xb._xb._",
+        "...x...x...",
+        "4.rx5.tx6.y",
+        "xxxxxxxxxxx",
+        "b._xb._xb._",
+        "...x...x...",
+        "7.ux8.ix9.o"
+    ],
+    "tile_types": {
+        ".": ["walk"],
+        "1": ["start-a", "walk"],
+        "2": ["start-b", "walk"],
+        "3": ["start-c", "walk"],
+        "4": ["start-d", "walk"],
+        "5": ["start-e", "walk"],
+        "6": ["start-f", "walk"],
+        "7": ["start-g", "walk"],
+        "8": ["start-h", "walk"],
+        "9": ["start-i", "walk"],
+
+        "q": ["end-a", "walk"],
+        "w": ["end-b", "walk"],
+        "e": ["end-c", "walk"],
+        "r": ["end-d", "walk"],
+        "t": ["end-e", "walk"],
+        "y": ["end-f", "walk"],
+        "u": ["end-g", "walk"],
+        "i": ["end-h", "walk"],
+        "o": ["end-i", "walk"],
+
+        "_": ["blocktarget-item", "walk"],
+        "b": ["block-item", "walk"],
+
+        "x": ["wall"]
+    },
+    "fps": 3,
+    "colors": {
+    }
+}
