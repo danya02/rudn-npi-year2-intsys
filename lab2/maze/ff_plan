@@ -158,10 +158,10 @@ step    0: MOVE ROBOT_A T0_2 T0_1
        71: MOVE ROBOT_I T10_9 T10_10
      
 
-time spent:    0.03 seconds instantiating 140895 easy, 0 hard action templates
-               0.02 seconds reachability analysis, yielding 1924 facts and 378 actions
+time spent:    0.02 seconds instantiating 140895 easy, 0 hard action templates
+               0.03 seconds reachability analysis, yielding 1924 facts and 378 actions
                0.00 seconds creating final representation with 513 relevant facts
                0.00 seconds building connectivity graph
-               0.07 seconds searching, evaluating 379 states, to a max depth of 1
-               0.12 seconds total time
+               0.08 seconds searching, evaluating 379 states, to a max depth of 1
+               0.13 seconds total time
 

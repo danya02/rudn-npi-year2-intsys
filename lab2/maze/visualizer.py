@@ -568,7 +568,7 @@ if __name__ == '__main__':
         map = json.load(open('problems/' + map_name))
         plan = open('plans/' + map_name + '.plan').read()
         presenter = FilePresenter('output')
-        presenter = ScreenPresenter(loop=False)
+        #presenter = ScreenPresenter(loop=False)
         renderer = Renderer(map, plan, presenter)
         renderer.run()
     else:
