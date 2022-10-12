@@ -1,0 +1,26 @@
+{
+    "chart":[
+        "b...x...s",
+        "V.xxxxx.B",
+        ".>x>.<x<.",
+        "A.xxxxx.n",
+        "_...x...c"
+    ],
+    "tile_types": {
+        ".": ["walk"],
+        "A": ["start-a", "walk"],
+        "V": ["end-a", "walk"],
+        "B": ["walk", "start-b"],
+        "n": ["end-b", "walk"],
+        ">": ["teleport-group-Q", "walk"],
+        "<": ["teleport-group-W", "walk"],
+        "_": ["blocktarget-b", "walk"],
+        "b": ["block-a", "walk"],
+        "s": ["color-remover-machine", "walk"],
+        "c": ["color-assigner-machine-b", "walk"],
+        "x": ["wall"]
+    },
+    "fps": 1,
+    "colors": {
+    }
+}
