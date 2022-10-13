@@ -25,7 +25,7 @@
         "T": ["walk", "teleport-group-t"],
         "x": ["wall"]
     },
-    "fps": 5,
+    "fps": 2,
     "colors":
     {
         "block-p": [245, 169, 184],

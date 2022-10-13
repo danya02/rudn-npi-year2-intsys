@@ -40,6 +40,8 @@
 
     (gate_at ?x - tile ?group - block_group) ;; there is a gate on tile x belonging to group
 
+    (occupied ?x - tile)
+
 )
 
 
@@ -50,10 +52,13 @@
         (at ?r ?x)
         (adjacent ?x ?y)
         (walkable ?y)
+        (not (occupied ?y))
     )
     :effect (and
         (not (at ?r ?x))
         (at ?r ?y)
+        (not (occupied ?x))
+        (occupied ?y)
     )
 )
 
@@ -74,11 +79,15 @@
         (not (at ?r ?target)) ;; This is so that the agent does not teleport to the tile they are in --
         ;; if this is not here, the agent may waste time trying to teleport to the same tile
 
+        (not (occupied ?target))
+
         (not (teleporter_at ?current tgroup_unpaired)) ;; This is so that unpaired teleporters don't work.
     )
     :effect (and
         (not (at ?r ?current))
         (at ?r ?target)
+        (not (occupied ?current))
+        (occupied ?target)
     )
 )
 

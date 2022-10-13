@@ -63,6 +63,7 @@ def emit_template(template):
                         if tag.startswith('start-'):
                             robot_name = tag.replace('start-','')
                             print(f'  (at robot_{robot_name} t{w}_{h})')
+                            print(f'  (occupied t{w}_{h})')
                         
 
 

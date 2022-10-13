@@ -8,160 +8,70 @@ problem 'SIMPLE_MAZE' defined
 
 
 
-Cueing down from goal distance:   72 into depth [1]
+Cueing down from goal distance:  115 into depth [1]
+                                 113            [1]
+                                 112            [1]
+                                 111            [1]
+                                 110            [1][2]
+                                 108            [1]
+                                 107            [1][2]
+                                 105            [1]
+                                 104            [1]
+                                 103            [1]
+                                 102            [1]
+                                 101            [1][2]
+                                  98            [1][2]
+                                  97            [1][2]
+                                  96            [1][2]
+                                  91            [1][2]
+                                  90            [1][2]
+                                  87            [1][2]
+                                  86            [1]
+                                  85            [1]
+                                  84            [1]
+                                  83            [1]
+                                  82            [1]
+                                  81            [1]
+                                  80            [1]
+                                  79            [1]
+                                  78            [1]
+                                  77            [1]
+                                  76            [1]
+                                  75            [1]
+                                  74            [1]
+                                  73            [1][2][3][4][5]
+                                  72            [1]
                                   71            [1]
                                   70            [1]
                                   69            [1]
-                                  68            [1]
+                                  68            [1][2][3][4][5][6]
                                   67            [1]
-                                  66            [1]
-                                  65            [1]
-                                  64            [1]
+                                  66            [1][2]
+                                  65            [1][2]
+                                  64            [1][2][3][4][5]
                                   63            [1]
                                   62            [1]
                                   61            [1]
-                                  60            [1]
-                                  59            [1]
-                                  58            [1]
-                                  57            [1]
-                                  56            [1]
-                                  55            [1]
-                                  54            [1]
-                                  53            [1]
+                                  58            [1][2]
+                                  56            [1][2][3][4][5]
+                                  54            [1][2]
                                   52            [1]
                                   51            [1]
-                                  50            [1]
-                                  49            [1]
+                                  50            [1][2]
                                   48            [1]
                                   47            [1]
                                   46            [1]
                                   45            [1]
                                   44            [1]
                                   43            [1]
-                                  42            [1]
-                                  41            [1]
-                                  40            [1]
-                                  39            [1]
-                                  38            [1]
-                                  37            [1]
-                                  36            [1]
-                                  35            [1]
+                                  42            [1][2][3][4][5][6][7]
+                                  40            [1][2][3][4][5][6][7][8][9][10][11][12][13]
+                                  39            [1][2][3]
+                                  38            [1][2][3]
+                                  37            [1][2]
                                   34            [1]
-                                  33            [1]
-                                  32            [1]
-                                  31            [1]
-                                  30            [1]
-                                  29            [1]
+                                  33            [1][2][3][4][5][6][7][8]
                                   28            [1]
                                   27            [1]
-                                  26            [1]
-                                  25            [1]
-                                  24            [1]
-                                  23            [1]
-                                  22            [1]
-                                  21            [1]
-                                  20            [1]
-                                  19            [1]
-                                  18            [1]
-                                  17            [1]
-                                  16            [1]
-                                  15            [1]
-                                  14            [1]
-                                  13            [1]
-                                  12            [1]
-                                  11            [1]
-                                  10            [1]
-                                   9            [1]
-                                   8            [1]
-                                   7            [1]
-                                   6            [1]
-                                   5            [1]
-                                   4            [1]
-                                   3            [1]
-                                   2            [1]
-                                   1            [1]
-                                   0            
-
-ff: found legal plan as follows
-
-step    0: MOVE ROBOT_A T0_2 T0_1
-        1: MOVE ROBOT_B T4_2 T4_1
-        2: MOVE ROBOT_C T8_2 T8_1
-        3: MOVE ROBOT_D T0_6 T0_5
-        4: MOVE ROBOT_E T4_6 T4_5
-        5: MOVE ROBOT_F T8_6 T8_5
-        6: MOVE ROBOT_G T0_10 T0_9
-        7: MOVE ROBOT_H T4_10 T4_9
-        8: MOVE ROBOT_I T8_10 T8_9
-        9: MOVE ROBOT_A T0_1 T0_0
-       10: MOVE ROBOT_B T4_1 T4_0
-       11: MOVE ROBOT_C T8_1 T8_0
-       12: MOVE ROBOT_D T0_5 T0_4
-       13: MOVE ROBOT_E T4_5 T4_4
-       14: MOVE ROBOT_F T8_5 T8_4
-       15: MOVE ROBOT_G T0_9 T0_8
-       16: MOVE ROBOT_H T4_9 T4_8
-       17: MOVE ROBOT_I T8_9 T8_8
-       18: PICK_UP_BLOCK ROBOT_A T0_0 BGROUP_ITEM
-       19: MOVE ROBOT_A T0_0 T1_0
-       20: MOVE ROBOT_A T1_0 T2_0
-       21: PICK_UP_BLOCK ROBOT_B T4_0 BGROUP_ITEM
-       22: MOVE ROBOT_B T4_0 T5_0
-       23: MOVE ROBOT_B T5_0 T6_0
-       24: PICK_UP_BLOCK ROBOT_C T8_0 BGROUP_ITEM
-       25: MOVE ROBOT_C T8_0 T9_0
-       26: MOVE ROBOT_C T9_0 T10_0
-       27: PICK_UP_BLOCK ROBOT_D T0_4 BGROUP_ITEM
-       28: MOVE ROBOT_D T0_4 T1_4
-       29: MOVE ROBOT_D T1_4 T2_4
-       30: PICK_UP_BLOCK ROBOT_E T4_4 BGROUP_ITEM
-       31: MOVE ROBOT_E T4_4 T5_4
-       32: MOVE ROBOT_E T5_4 T6_4
-       33: PICK_UP_BLOCK ROBOT_F T8_4 BGROUP_ITEM
-       34: MOVE ROBOT_F T8_4 T9_4
-       35: MOVE ROBOT_F T9_4 T10_4
-       36: PICK_UP_BLOCK ROBOT_G T0_8 BGROUP_ITEM
-       37: MOVE ROBOT_G T0_8 T1_8
-       38: MOVE ROBOT_G T1_8 T2_8
-       39: PICK_UP_BLOCK ROBOT_H T4_8 BGROUP_ITEM
-       40: MOVE ROBOT_H T4_8 T5_8
-       41: MOVE ROBOT_H T5_8 T6_8
-       42: PICK_UP_BLOCK ROBOT_I T8_8 BGROUP_ITEM
-       43: MOVE ROBOT_I T8_8 T9_8
-       44: MOVE ROBOT_I T9_8 T10_8
-       45: DROP_BLOCK ROBOT_A T2_0 BGROUP_ITEM
-       46: MOVE ROBOT_A T2_0 T2_1
-       47: MOVE ROBOT_A T2_1 T2_2
-       48: DROP_BLOCK ROBOT_B T6_0 BGROUP_ITEM
-       49: MOVE ROBOT_B T6_0 T6_1
-       50: MOVE ROBOT_B T6_1 T6_2
-       51: DROP_BLOCK ROBOT_C T10_0 BGROUP_ITEM
-       52: MOVE ROBOT_C T10_0 T10_1
-       53: MOVE ROBOT_C T10_1 T10_2
-       54: DROP_BLOCK ROBOT_D T2_4 BGROUP_ITEM
-       55: MOVE ROBOT_D T2_4 T2_5
-       56: MOVE ROBOT_D T2_5 T2_6
-       57: DROP_BLOCK ROBOT_E T6_4 BGROUP_ITEM
-       58: MOVE ROBOT_E T6_4 T6_5
-       59: MOVE ROBOT_E T6_5 T6_6
-       60: DROP_BLOCK ROBOT_F T10_4 BGROUP_ITEM
-       61: MOVE ROBOT_F T10_4 T10_5
-       62: MOVE ROBOT_F T10_5 T10_6
-       63: DROP_BLOCK ROBOT_G T2_8 BGROUP_ITEM
-       64: MOVE ROBOT_G T2_8 T2_9
-       65: MOVE ROBOT_G T2_9 T2_10
-       66: DROP_BLOCK ROBOT_H T6_8 BGROUP_ITEM
-       67: MOVE ROBOT_H T6_8 T6_9
-       68: MOVE ROBOT_H T6_9 T6_10
-       69: DROP_BLOCK ROBOT_I T10_8 BGROUP_ITEM
-       70: MOVE ROBOT_I T10_8 T10_9
-       71: MOVE ROBOT_I T10_9 T10_10
-     
-
-time spent:    0.02 seconds instantiating 140895 easy, 0 hard action templates
-               0.03 seconds reachability analysis, yielding 1924 facts and 378 actions
-               0.00 seconds creating final representation with 513 relevant facts
-               0.00 seconds building connectivity graph
-               0.08 seconds searching, evaluating 379 states, to a max depth of 1
-               0.13 seconds total time
-
+                                  26            [1][2][3][4][5][6][7]
+                                  24            [1][2][3][4][5][6][7][8][9][10][11][12][13][14][15][16][17]

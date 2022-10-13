@@ -548,7 +548,7 @@ class Renderer:
             self.painting_teleporter = group
             print("Привязываю портал к группе", group)
 
-    def unpair_teleporter(self, robot_name, x, y):
+    def unpair_teleporter(self, robot_name, x, y, group):
         self.switch_context(robot_name)
         if self.robot_location == (x, y):
             self.painting_teleporter = 'unpaired'
@@ -568,7 +568,7 @@ if __name__ == '__main__':
         map = json.load(open('problems/' + map_name))
         plan = open('plans/' + map_name + '.plan').read()
         presenter = FilePresenter('output')
-        #presenter = ScreenPresenter(loop=False)
+        presenter = ScreenPresenter(loop=True)
         renderer = Renderer(map, plan, presenter)
         renderer.run()
     else:

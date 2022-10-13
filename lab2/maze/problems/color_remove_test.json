@@ -18,7 +18,7 @@
         "x": ["walk", "blocktarget-colorless"],
         "M": ["walk", "color-remover-machine"]
     },
-    "fps": 5,
+    "fps": 3,
     "colors":
     {
         "block-a": [255, 0, 0],

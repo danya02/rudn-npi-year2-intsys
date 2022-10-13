@@ -1,0 +1,45 @@
+{
+    "chart":[
+        "qwexrtyxuio",
+        ".1.!.2.!.3.",
+        "...x...x...",
+        "x!xxx!xxx!x",
+        "b..x...x..b",
+        ".4.!.5.!.6.",
+        "..bx...xb..",
+        "x!xxx!xxx!x",
+        "..bx...xb..",
+        "..b!.8.!b9.",
+        "7..x...x..."
+    ],
+    "tile_types": {
+        ".": ["walk"],
+        "1": ["start-a", "walk"],
+        "2": ["start-b", "walk"],
+        "3": ["start-c", "walk"],
+        "4": ["start-d", "walk"],
+        "5": ["start-e", "walk"],
+        "6": ["start-f", "walk"],
+        "7": ["start-g", "walk"],
+        "8": ["start-h", "walk"],
+        "9": ["start-i", "walk"],
+
+        "q": ["end-a", "walk"],
+        "w": ["end-b", "walk"],
+        "e": ["end-c", "walk"],
+        "r": ["end-d", "walk"],
+        "t": ["end-e", "walk"],
+        "y": ["end-f", "walk"],
+        "u": ["end-g", "walk"],
+        "i": ["end-h", "walk"],
+        "o": ["end-i", "walk"],
+
+        "b": ["block-item", "walk"],
+        "!": ["gate-item", "walk"],
+
+        "x": ["wall"]
+    },
+    "fps": 3,
+    "colors": {
+    }
+}``
