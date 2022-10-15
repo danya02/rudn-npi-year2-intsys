@@ -1,4 +1,4 @@
-extern "C" const int CELL_SIZE = 32;
+extern "C" const int CELL_SIZE = 16;
 
 // Computes the kernel of a class -- the average vector between a list of object vectors of that class.
 // `object_vectors` is a list of pointers to object vectors. Each object vector is CELL_SIZE**2 long.
