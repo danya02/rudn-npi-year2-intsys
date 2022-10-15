@@ -5,4 +5,4 @@ from ui import Window
 
 if __name__ == '__main__':
     window = Window()
-    window.run()
+    window.run('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')

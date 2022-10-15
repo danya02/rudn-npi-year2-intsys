@@ -1,15 +1,39 @@
 from typing import Dict, List
 import pygame
 from extern_calc import CELL_SIZE
+import requests
+import tempfile
 
 pygame.init()
 symbols = "123"
 
+def instantiate_font_from_string(font_name: str) -> pygame.font.Font:
+    font_name = font_name.strip()
+    if font_name.startswith('sys:'):
+        return pygame.font.SysFont(font_name[4:], CELL_SIZE)
+    elif font_name.startswith('file:'):
+        return pygame.font.Font(font_name[5:], CELL_SIZE)
+    elif font_name.startswith('web:'):
+        with tempfile.NamedTemporaryFile() as f:
+            f.write(requests.get(font_name[4:]).content)
+            f.flush()
+            return pygame.font.Font(f.name, CELL_SIZE)
+    else:
+        raise ValueError(f"Unknown font type {font_name}")
+
+
+#def load_fonts() -> List[pygame.font.Font]:
+#    fonts = pygame.font.get_fonts()
+#    usable_fonts = [i.strip() for i in open('/home/danya/Documents/university/rudn-npi-year2-intsys/lab3/usable-fonts.txt').read().splitlines()]
+#    fonts = [pygame.font.SysFont(font, CELL_SIZE) for font in fonts if font in usable_fonts]
+#    return fonts
+
+def load_fonts_from_list(font_list: List[str]) -> List[pygame.font.Font]:
+    return [instantiate_font_from_string(font) for font in font_list]
+
 def load_fonts() -> List[pygame.font.Font]:
-    fonts = pygame.font.get_fonts()
-    usable_fonts = [i.strip() for i in open('/home/danya/Documents/university/rudn-npi-year2-intsys/lab3/usable-fonts.txt').read().splitlines()]
-    fonts = [pygame.font.SysFont(font, CELL_SIZE) for font in fonts if font in usable_fonts]
-    return fonts
+    font_list = open('/home/danya/Documents/university/rudn-npi-year2-intsys/lab3/demo-fonts.txt').read().splitlines()
+    return load_fonts_from_list(font_list)
 
 def render_symbol_in_fonts(fonts: List[pygame.font.Font], symbol: str) -> List[pygame.Surface]:
     surfaces = [font.render(symbol, True, (255,255,255)) for font in fonts]

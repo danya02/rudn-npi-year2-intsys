@@ -10,6 +10,7 @@ matrix_type = c_double * (CELL_SIZE**4)  # The type representing the covariance 
 
 def surface_to_vector(surface: pygame.Surface) -> vector_type:
     """Convert a pygame surface to the vector representation"""
+    if isinstance(surface, vector_type): return surface
     if surface.get_width() != CELL_SIZE or surface.get_height() != CELL_SIZE:
         raise ValueError(f"Surface must be {CELL_SIZE}x{CELL_SIZE} pixels")
     vector = matrix_type()
@@ -21,6 +22,7 @@ def surface_to_vector(surface: pygame.Surface) -> vector_type:
 
 def vector_to_surface(vector: vector_type) -> pygame.Surface:
     """Convert a vector representation to a pygame surface"""
+    if isinstance(vector, pygame.Surface): return vector
     surface = pygame.Surface((CELL_SIZE, CELL_SIZE))
     for y in range(CELL_SIZE):
         for x in range(CELL_SIZE):

@@ -1,0 +1,9 @@
+sys:opensans
+sys:notoserif
+sys:notosans
+sys:cantarell
+sys:firacode
+sys:hashtag
+sys:ocrastd
+web:https://undertale.com/assets/fonts/8bitOperatorPlus-Regular.ttf
+web:https://undertale.com/assets/fonts/8bitOperatorPlus-Bold.ttf
