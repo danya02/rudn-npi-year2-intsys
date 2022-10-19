@@ -1,5 +1,4 @@
 from operator import inv
-from tkinter.tix import CELL
 import pygame
 import pygame.gfxdraw
 from extern_calc import *
@@ -33,6 +32,10 @@ class Window:
         self.latest_predictions = []
         self.invalidate_predictions = True
         self.latest_prediction_duration = 0
+        self.dataset_list_offset = 0
+        self.max_dataset_list_offset = 0
+
+        self.load_buttons = dict()
 
     
     def write_big_message(self, text):
@@ -78,11 +81,25 @@ class Window:
                 if not isinstance(data_point, pygame.Surface):
                     data_point = vector_to_surface(data_point)
                 obj = pygame.transform.scale(data_point, (SURF_TARGET_SIZE, SURF_TARGET_SIZE))
-                self.latest_predictions.append((dist, obj, symbol_class))
+                self.latest_predictions.append((dist, obj, symbol_class, data_point))
         self.latest_predictions.sort(key=lambda x: x[0])
 
         self.latest_prediction_duration = time.perf_counter() - predict_start
 
+
+    def make_load_canvas(self, img: pygame.Surface):
+        def load_canvas():
+            self.drawing_surface.blit(img, (0,0))
+            self.invalidate_predictions = True
+        return load_canvas
+
+    def make_dataset_list(self):
+        list = []
+        for symbol in self.dataset:
+            for data_point in self.dataset[symbol]:
+                list.append(data_point)
+        self.max_dataset_list_offset = len(list) - 1
+        return list
 
     def draw(self):
         self.display.fill((0,0,0))
@@ -104,18 +121,84 @@ class Window:
             pygame.draw.circle(self.display, (64, 64, 64), self.current_cursor_position, self.current_cursor_size*cursor_scale, 1)
         
         # draw the predictions
-        for i, (dist, kernel, symbol_class) in enumerate(self.latest_predictions[:10]):
+        for i, (dist, kernel, symbol_class, small_kernel) in enumerate(self.latest_predictions[:10]):
             render = self.font.render(f"{symbol_class}: {dist}", True, (255,255,255))
             rect = kernel.get_rect()
-            rect.topleft = (self.drawing_surface_rect.right + 200, i * (rect.height + 20) + 20)
+            rect.topleft = (self.drawing_surface_rect.right + 300, i * (rect.height + 20) + 20)
             self.display.blit(kernel, rect)
             self.display.blit(render, rect.move(rect.width+20, rect.height//2))
+            self.load_buttons[(rect.left, rect.top, rect.width, rect.height)] = small_kernel
+
+            
             pygame.draw.rect(self.display, (255,255,255), rect, 1)
+
+
+        # draw a grid of dataset items (3 items wide), draw them below the drawing surface
+        dataset_list = self.make_dataset_list()
+        for i, data_point in enumerate(dataset_list[self.dataset_list_offset:self.dataset_list_offset+9]):
+            if not isinstance(data_point, pygame.Surface):
+                data_point = vector_to_surface(data_point)
+            obj = pygame.transform.scale(data_point, (SURF_TARGET_SIZE, SURF_TARGET_SIZE))
+            rect = obj.get_rect()
+            rect.topleft = (i % 3 * (rect.width + 20) + 20, self.drawing_surface_rect.bottom + 20 + i // 3 * (rect.height + 20))
+            self.display.blit(obj, rect)
+            self.load_buttons[(rect.left, rect.top, rect.width, rect.height)] = data_point
+            pygame.draw.rect(self.display, (255,255,255), rect, 1)
+        
+        # If the current offset is not 0, draw an up arrow next to the grid
+        if self.dataset_list_offset > 0:
+            i = 2
+
+            # The arrow must be next to the third item in the grid
+            third_item_rect_loc = (i % 3 * (rect.width + 20) + 20, self.drawing_surface_rect.bottom + 20 + i // 3 * (rect.height + 20))
+            third_item_rect = pygame.Rect(third_item_rect_loc, (SURF_TARGET_SIZE, SURF_TARGET_SIZE))
+
+            x, y = third_item_rect.topright
+
+            x += 20
+            y += SURF_TARGET_SIZE // 2
+
+            # draw an arrow shape pointing up to the right of the rect
+            pygame.draw.polygon(self.display, (0,255,0),
+                [
+                    (x, y),
+                    (x + 10, y + 20),
+                    (x - 10, y + 20)
+                ]
+            )
+
+        # If the current offset is not the max offset, draw a down arrow next to the grid
+        if self.dataset_list_offset < self.max_dataset_list_offset:
+            i = 8
+
+            # The arrow must be next to the ninth item in the grid
+            ninth_item_rect_loc = (i % 3 * (rect.width + 20) + 20, self.drawing_surface_rect.bottom + 20 + i // 3 * (rect.height + 20))
+            ninth_item_rect = pygame.Rect(ninth_item_rect_loc, (SURF_TARGET_SIZE, SURF_TARGET_SIZE))
+
+            x, y = ninth_item_rect.bottomright
+
+            x += 20
+            y -= SURF_TARGET_SIZE // 2
+
+            # draw an arrow shape pointing down to the right of the rect
+            pygame.draw.polygon(self.display, (0,255,0),
+                [
+                    (x, y),
+                    (x + 10, y - 20),
+                    (x - 10, y - 20)
+                ]
+            )
         
         # draw the prediction time in the bottom left corner
         render = self.font.render(f"Prediction time: {self.latest_prediction_duration} seconds", True, (255,255,255))
         rect = render.get_rect()
         rect.bottomleft = self.display.get_rect().bottomleft
+        self.display.blit(render, rect)
+
+        # Draw the FPS in the top left corner
+        render = self.font.render(f"FPS: {self.clock.get_fps():.2f}", True, (255,255,255))
+        rect = render.get_rect()
+        rect.topleft = self.display.get_rect().topleft
         self.display.blit(render, rect)
 
     def handle_events(self):
@@ -126,11 +209,24 @@ class Window:
                 if event.key == pygame.K_ESCAPE:
                     self.drawing_surface.fill((0,0,0))
                     self.invalidate_predictions = True
+                elif event.key == pygame.K_DOWN:
+                    self.dataset_list_offset += 3
+                    self.dataset_list_offset = min(self.dataset_list_offset, self.max_dataset_list_offset)
+                elif event.key == pygame.K_UP:
+                    self.dataset_list_offset -= 3
+                    self.dataset_list_offset = max(self.dataset_list_offset, 0)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 4:
                     self.current_cursor_size = min(16, self.current_cursor_size + 1)
                 elif event.button == 5:
                     self.current_cursor_size = max(1, self.current_cursor_size - 1)
+                elif event.button == 1:
+                    for rect in self.load_buttons:
+                        real_rect = pygame.Rect(rect)
+                        if real_rect.collidepoint(event.pos):
+                            self.make_load_canvas(self.load_buttons[rect])()
+                            break
+
             elif event.type == pygame.MOUSEMOTION:
                 self.current_cursor_position = event.pos
                 # get the relative position inside the drawing rect
